@@ -26,4 +26,14 @@ router.get('/profile',
     });
 });
 
+router.get('/test', (req, res) => {
+  res.json({ user: 'tobi' })
+})
+
+router.get('/test2',
+  passportAuth0.authenticate('auth0', { failureRedirect: '/login', failureMessage: true }),
+  function(req, res) {
+    res.json(req.user.username);
+  });
+
 module.exports = router;
