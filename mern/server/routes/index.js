@@ -20,17 +20,17 @@ router.get('/profile',
   passportAuth0.authenticate('auth0', { failureRedirect: '/login' }),
   function(req, res) {
     const { _raw, _json, ...userProfile } = req.user;
-    res.render("user", {
+    res.json("user", {
       title: "Profile",
       userProfile: userProfile
     });
 });
 
-router.get('/test', (req, res) => {
+router.get('/test2', (req, res) => {
   res.json({ user: 'tobi' })
 })
 
-router.get('/test2',
+router.get('/test',
   passportAuth0.authenticate('auth0', { failureRedirect: '/login', failureMessage: true }),
   function(req, res) {
     res.json(req.user.username);
