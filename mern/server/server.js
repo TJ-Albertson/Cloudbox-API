@@ -10,6 +10,24 @@ const port = process.env.PORT || 5000;
 require("dotenv").config({ path: "./config.env" });
 
 
+app.use(cors({
+  origin: ["*"]
+}));
+
+const { auth, requiresAuth } = require('express-openid-connect');
+
+const config = {
+  authRequired: true,
+  auth0Logout: true,
+  baseURL: 'http://localhost:5000',
+  clientID: process.env.AUTH0_CLIENT_ID,
+  issuerBaseURL: process.env.AUTH0_DOMAIN,
+  secret: process.env.AUTH0_CLIENT_SECRET
+};
+
+app.use(auth(config));
+
+
 app.use(session({
   //need to generate secret and put in .env
   secret: 'keyboard cat',
@@ -20,7 +38,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-app.use(cors());
+
 app.use(express.json());
 app.use('/record', require("./routes/record"));
 app.use('/', require('./routes/index.js'));
@@ -28,6 +46,18 @@ app.use('/', require('./routes/index.js'));
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
 const User = require('./models/user');
+
+
+
+// req.isAuthenticated is provided from the auth router
+app.get('/', (req, res) => {
+  res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out')
+});
+
+app.get('/profile', requiresAuth(), (req, res) => {
+  res.send(JSON.stringify(req.oidc.user));
+});
+
 
 //run()
 async function run() {

@@ -12,7 +12,7 @@ passport.use(new Auth0Strategy({
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
   callbackURL: process.env.AUTH0_CALLBACK_URL
   },
-  // linkedin sends back the tokens and profile info
+  // auth0 sends back the tokens and profile info
   function(token, tokenSecret, profile, done) {
 
     var searchQuery = {

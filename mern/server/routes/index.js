@@ -16,18 +16,12 @@ router.get('/auth/auth0/callback',
     res.json(req.user);
 });
 
-router.get('/profile', 
-  passportAuth0.authenticate('auth0', { failureRedirect: '/login' }),
-  function(req, res) {
-    const { _raw, _json, ...userProfile } = req.user;
-    res.json("user", {
-      title: "Profile",
-      userProfile: userProfile
-    });
-});
 
 router.get('/test2', (req, res) => {
-  res.json({ user: 'tobi' })
+  res.json({
+    name: "tobi",
+    age: 99
+   })
 })
 
 router.get('/test',
