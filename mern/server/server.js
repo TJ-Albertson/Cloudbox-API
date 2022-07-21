@@ -1,62 +1,115 @@
 const express = require("express");
-const app = express();
-
-const session = require('express-session');
 const mongoose = require('mongoose');
-const passport = require('passport');
 const cors = require("cors");
+const bodyParser = require("body-parser")
+const jwt = require("jsonwebtoken")
+const bcrypt = require("bcrypt")
+const User = require('./models/user');
 
 const port = process.env.PORT || 5000;
 require("dotenv").config({ path: "./config.env" });
 
+const app = express();
+app.use(cors());
 
-app.use(cors({
-  origin: ["*"]
-}));
-
-const { auth, requiresAuth } = require('express-openid-connect');
-
-const config = {
-  authRequired: true,
-  auth0Logout: true,
-  baseURL: 'http://localhost:5000',
-  clientID: process.env.AUTH0_CLIENT_ID,
-  issuerBaseURL: process.env.AUTH0_DOMAIN,
-  secret: process.env.AUTH0_CLIENT_SECRET
-};
-
-app.use(auth(config));
-
-
-app.use(session({
-  //need to generate secret and put in .env
-  secret: 'keyboard cat',
-  resave: true,
-  saveUninitialized: true
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-
+const urlEncodedParser = bodyParser.urlencoded({ extended: false })
+app.use(bodyParser.json(), urlEncodedParser)
 
 
 app.use(express.json());
-app.use('/record', require("./routes/record"));
-app.use('/', require('./routes/index.js'));
+
+//app.use('/', require('./routes/index.js'));
+
 
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
-const User = require('./models/user');
 
 
+//register
+app.post("/register", async (req, res) => {
+  const user = req.body
 
-// req.isAuthenticated is provided from the auth router
-app.get('/', (req, res) => {
-  res.send(req.oidc.isAuthenticated() ? 'Logged in' : 'Logged out')
-});
+  const takenEmail = await User.findOne({email: user.email})
 
-app.get('/profile', requiresAuth(), (req, res) => {
-  res.send(JSON.stringify(req.oidc.user));
-});
+  if (takenEmail) {
+    res.json({message: "Email has already been taken"})
+  } else {
+    user.password = await bcrypt.hash(req.body.password, 10)
+
+    const dbUser = new User ({
+      email: user.email.toLowerCase(),
+      password: user.password,
+    })
+
+    dbUser.save()
+    res.json({message: "Success"})
+  }
+})
+
+//login
+app.post("/login", (req, res) => {
+  const userLoggingIn = req.body
+  console.log(userLoggingIn)
+  User.findOne({email: userLoggingIn.email})
+  .then(dbUser => {
+    if (!dbUser) {
+      return res.json({
+        message: "Invalid Username or Password"
+      })
+    }
+    bcrypt.compare(userLoggingIn.password, dbUser.password)
+    .then(isCorrect => {
+      if (isCorrect) {
+        const payload = {
+          id: dbUser._id,
+          email: dbUser.email,
+        }
+        jwt.sign(
+          payload,
+          process.env.JWT_SECRET,
+          {expiresIn: 86400},
+          (err, token) => {
+            if (err) return res.json({messafe: err})
+            return res.json({
+              message: "Success",
+              token: "Bearer " + token
+            })
+          }
+        )
+      } else {
+        return res.json({
+          message: "Invalid Username or Password"
+        })
+      }
+    })
+  })
+})
+
+//verfy
+function verifyJWT(req, res, next) {
+  const token = req.headers["x0access-token"]?.split(' ')[1]
+
+  if (token) {
+    jwt.verify(token, process.env.PASSPORTSECRET, (err, decoded) => {
+      if (err) return res.json({
+        isLoggeIn: false,
+        message: "Failed to Authenticate"
+      })
+      req.user = {}
+      req.user.id = decoded.id
+      req.user.username = decoded.username
+      next()
+    })
+  } else {
+    res.json({message: "Incorret Token Given", isLoggedIn: false})
+  }
+}
+
+app.get("/isUserAuth", verifyJWT, (req, res) => {
+  return res.json({isLoggedIn: true, username: req.user.username})
+})
+
+
 
 
 //run()
