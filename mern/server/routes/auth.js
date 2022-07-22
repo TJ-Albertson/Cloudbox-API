@@ -10,36 +10,40 @@ router.get("/isLoggedIn", verifyJWT, (req, res) => {
     return res.json({isLoggedIn: true, email: req.user.email})
 })  
 
-router.post("/isEmailTaken", async (req, res) => {
+router.post("/isEmailTaken", async (req, res, next) => {
     const user = req.body
-    takenEmail = await User.findOne({email: user.email})
+    const takenEmail = await User.findOne({email: user.email})
     if (takenEmail) {
         return res.json({message: "Taken"})
     }
-    return res.json({message: "Open"})    
+    return res.json({message: null  })  
 })
 
 router.post("/register", async (req, res) => {
 
+    console.log("register request")
+
     const user = req.body
+
     const takenEmail = await User.findOne({email: user.email})
-  
     if (takenEmail) {
-        res.json({message: "Email has already been taken"})
+        res.json({message: "Email taken"})
     } else {
         user.password = await bcrypt.hash(req.body.password, 10)
-  
         const dbUser = new User ({
-        email: user.email.toLowerCase(),
-        password: user.password,
-    })
-  
+            email: user.email.toLowerCase(),
+            password: user.password,
+        })
+      
         dbUser.save()
         res.json({message: "Success"})
     }
+    
 })
   
 router.post("/login", (req, res) => {
+
+    console.log("login request")
 
     const userLoggingIn = req.body
     console.log(userLoggingIn)
