@@ -10,11 +10,14 @@ router.get("/isLoggedIn", verifyJWT, (req, res) => {
     return res.json({isLoggedIn: true, email: req.user.email})
 })  
 
-router.get("isEmailTaken", (req, res) => {
-    const takenEmail = await User.findOne({})
-    return res.json
-}
-)
+router.post("/isEmailTaken", async (req, res) => {
+    const user = req.body
+    takenEmail = await User.findOne({email: user.email})
+    if (takenEmail) {
+        return res.json({message: "Taken"})
+    }
+    return res.json({message: "Open"})    
+})
 
 router.post("/register", async (req, res) => {
 
