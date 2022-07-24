@@ -14,9 +14,9 @@ router.post("/isEmailTaken", async (req, res, next) => {
     const user = req.body
     const takenEmail = await User.findOne({email: user.email})
     if (takenEmail) {
-        return res.json({message: "Taken"})
+        return res.json({isEmailTaken: true})
     }
-    return res.json({message: null  })  
+    return res.json({isEmailTaken: false})
 })
 
 router.post("/register", async (req, res) => {
@@ -52,7 +52,7 @@ router.post("/login", (req, res) => {
     .then(dbUser => {
         if (!dbUser) {
             return res.json({
-            message: "Invalid Email or Password"
+            message: "Invalid Password"
             })
         }
         bcrypt.compare(userLoggingIn.password, dbUser.password)
@@ -76,7 +76,7 @@ router.post("/login", (req, res) => {
                 )
             } else {
                 return res.json({
-                    message: "Invalid Email or Password"
+                    message: "Invalid Password"
                 })
             }
         })

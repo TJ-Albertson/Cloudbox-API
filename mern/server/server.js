@@ -22,8 +22,10 @@ app.use('/', require('./routes/auth.js'));
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
 
+//mongodb+srv://admin2:kb0VEu3tabCHQ3hG@cluster0.c9dnp.mongodb.net/clients?retryWrites=true&w=majority
+
 app.listen(port, () => {
-  mongoose.connect('mongodb+srv://admin2:kb0VEu3tabCHQ3hG@cluster0.c9dnp.mongodb.net/clients?retryWrites=true&w=majority', { useNewUrlParser: true });
+  mongoose.connect(process.env.MONGODB, { useNewUrlParser: true });
 
   console.log(`Server is running on port: ${port}`);
 });
