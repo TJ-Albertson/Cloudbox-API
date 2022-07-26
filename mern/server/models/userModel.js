@@ -1,7 +1,5 @@
-//mongoose user scheme
 const mongoose = require('mongoose');
 
-// create User Schema
 const User = mongoose.Schema({
   email: String,
   password: String

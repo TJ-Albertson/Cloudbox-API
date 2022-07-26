@@ -3,13 +3,14 @@ const router = express.Router()
 
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
-const User = require("../models/user")
+const User = require("../models/userModel")
 const verifyJWT = require("../models/verifyJWT")
 
 router.get("/isLoggedIn", verifyJWT, (req, res) => {
     return res.json({isLoggedIn: true, email: req.user.email})
 })  
 
+//For frontend to check if email is taken. For login that doesn't ask if register/login
 router.post("/isEmailTaken", async (req, res, next) => {
     const user = req.body
     const takenEmail = await User.findOne({email: user.email})
