@@ -17,7 +17,7 @@ const upload = multer({
     fileSize: 1000000 // max file size 1MB = 1000000 bytes
   },
   fileFilter(req, file, cb) {
-    if (!file.originalname.match(/\.(jpeg|jpg|png|pdf|doc|docx|xlsx|xls)$/)) {
+    if (!file.originalname.match(/\.(jpeg|jpg|png|pdf|doc|docx|xlsx|xls|txt)$/)) {
       return cb(
         new Error(
           'only upload files with jpg, jpeg, png, pdf, doc, docx, xslx, xls format.'
@@ -28,13 +28,14 @@ const upload = multer({
   }
 });
 
+//also auto delete file if error uploading to mongo
+//need to add auto rename title if matching
 router.post('/upload', upload.single('file'), async (req, res) => {
     try {
-      const { title, description } = req.body;
+      const { title } = req.body;
       const { path, mimetype } = req.file;
       const file = new File({
         title,
-        description,
         file_path: path,
         file_mimetype: mimetype
       });
@@ -51,13 +52,12 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   }
 );
 
+//change to get by id
 router.get('/getAllFiles', async (req, res) => {
   try {
-    const files = await File.find({});
-    const sortedByCreationDate = files.sort(
-      (a, b) => b.createdAt - a.createdAt
-    );
-    res.send(sortedByCreationDate);
+    //sorts alphabeticaly
+    const files = await File.find({}).sort({title:1})
+    res.send(files);
   } catch (error) {
     res.status(400).send('Error while getting list of files. Try again later.');
   }
