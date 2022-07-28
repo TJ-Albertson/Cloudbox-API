@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-//add user id in schema
+//for list of emails share data with and list that have shared with them
 const fileSchema = mongoose.Schema(
   {
     ownerEmail: {
@@ -8,23 +8,19 @@ const fileSchema = mongoose.Schema(
       required: true,
       trim: true
     },
-    fileName: {
+    label: {
       type: String,
+      enum: ['forOther', 'forMe', 'forBoxes'],
       required: true,
       trim: true
     },
-    file_path: {
-      type: String,
-      required: true
-    },
-    file_mimetype: {
-      type: String,
-      required: true
-    }
+    emailArray: [{
+      type: String
+    }]
   },
   {
     timestamps: true
   }
 );
 
-module.exports = mongoose.model('File', fileSchema);
+module.exports = mongoose.model('emailGroup', fileSchema);

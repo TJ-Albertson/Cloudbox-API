@@ -37,6 +37,8 @@ router.post("/register", async (req, res) => {
         })
       
         dbUser.save()
+        //need to create new directory
+        
         res.json({message: "Success"})
     }
     

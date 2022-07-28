@@ -3,18 +3,22 @@ const express = require('express');
 const multer = require('multer');
 const File = require('../models/fileModel');
 const router = express.Router();
+const fs = require('fs-extra');
+
+//single list of files in file system. hierarchy in mongodb
 
 const upload = multer({
   storage: multer.diskStorage({
     destination(req, file, cb) {
-      cb(null, './files');
+      cb(null, './files/temp');
     },
     filename(req, file, cb) {
       cb(null, `${new Date().getTime()}_${file.originalname}`);
     }
   }),
   limits: {
-    fileSize: 1000000 // max file size 1MB = 1000000 bytes
+    fileSize: 1000000 // max file size  1MB = 1000000 bytes
+                      //               10MB = 10000000
   },
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(jpeg|jpg|png|pdf|doc|docx|xlsx|xls|txt)$/)) {
@@ -32,10 +36,15 @@ const upload = multer({
 //need to add auto rename title if matching
 router.post('/upload', upload.single('file'), async (req, res) => {
     try {
-      const { title } = req.body;
+      const { fileName, email } = req.body;
       const { path, mimetype } = req.file;
+
+      var dir = JSON.parse(req.body.data).email;
+
+      fs.move("./files/temp" + fileName, "./files/" + dir + '/' + fileName)
+
       const file = new File({
-        title,
+        fileName,
         file_path: path,
         file_mimetype: mimetype
       });
