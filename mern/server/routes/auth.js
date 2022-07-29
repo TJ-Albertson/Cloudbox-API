@@ -4,10 +4,14 @@ const router = express.Router()
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const User = require("../models/userModel")
+const emailGroup = require("../models/emailGroupModel")
 const verifyJWT = require("../models/verifyJWT")
 
-router.get("/isLoggedIn", verifyJWT, (req, res) => {
-    return res.json({isLoggedIn: true, email: req.user.email})
+router.get("/isLoggedIn", verifyJWT, async (req, res) => {
+
+    const emailsForBoxes = await emailGroup.find({ownerEmail: req.user.email, groupType: "forBoxes"})
+
+    return res.json({isLoggedIn: true, email: req.user.email, emailsForBoxes})
 })  
 
 //For frontend to check if email is taken. For login that doesn't ask if register/login
@@ -31,11 +35,34 @@ router.post("/register", async (req, res) => {
         res.json({message: "Email taken"})
     } else {
         user.password = await bcrypt.hash(req.body.password, 10)
+
+        //add user and groups to db
         const dbUser = new User ({
             email: user.email.toLowerCase(),
             password: user.password,
         })
-      
+
+        const groupForMe = new emailGroup ({
+            ownerEmail: user.email,
+            groupType: "forMe",
+            emailArray: [user.email]
+            
+        })
+
+        const groupForBoxes = new emailGroup ({
+            ownerEmail: user.email,
+            groupType: "forBoxes",
+            emailArray: [user.email]
+        })
+
+        const groupForOther = new emailGroup ({
+            ownerEmail: user.email,
+            groupType: "forOther",
+        })
+        
+        groupForBoxes.save()
+        groupForMe.save()
+        groupForOther.save()
         dbUser.save()
         //need to create new directory
         

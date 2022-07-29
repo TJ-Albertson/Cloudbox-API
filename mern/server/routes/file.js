@@ -13,7 +13,7 @@ const upload = multer({
       cb(null, './files/temp');
     },
     filename(req, file, cb) {
-      cb(null, `${new Date().getTime()}_${file.originalname}`);
+      cb(null, file.originalname);
     }
   }),
   limits: {
@@ -35,53 +35,41 @@ const upload = multer({
 //also auto delete file if error uploading to mongo
 //need to add auto rename title if matching
 router.post('/upload', upload.single('file'), async (req, res) => {
-    try {
-      const { fileName, email } = req.body;
-      const { path, mimetype } = req.file;
 
-      var dir = JSON.parse(req.body.data).email;
+  const { fileName, ownerEmail } = req.body;
+  const { path, mimetype } = req.file;
 
-      fs.move("./files/temp" + fileName, "./files/" + dir + '/' + fileName)
-
-      const file = new File({
-        fileName,
-        file_path: path,
-        file_mimetype: mimetype
-      });
-      await file.save();
-      res.send('file uploaded successfully.');
-    } catch (error) {
-      res.status(400).send('Error while uploading file. Try again later.');
-    }
-  },
-  (error, req, res, next) => {
-    if (error) {
-      res.status(500).send(error.message);
-    }
+  const takenFileName = await File.findOne({ fileName: fileName})
+  if (takenFileName) {
+    return res.json({isNameTaken: true})
   }
-);
+
+
+  fs.move("./files/temp/" + fileName, "./files/" + ownerEmail + '/' + fileName)
+
+  const file = new File({
+    ownerEmail,
+    fileName,
+    filePath: path,
+    fileMimetype: mimetype
+  });
+  await file.save();
+  res.send('file uploaded successfully.');
+});
 
 //change to get by id
 router.get('/getAllFiles', async (req, res) => {
-  try {
-    //sorts alphabeticaly
-    const files = await File.find({}).sort({title:1})
-    res.send(files);
-  } catch (error) {
-    res.status(400).send('Error while getting list of files. Try again later.');
-  }
+  //sorts alphabeticaly
+  const files = await File.find({}).sort({title:1})
+  res.send(files);
 });
 
-router.get('/download/:id', async (req, res) => {
-  try {
-    const file = await File.findById(req.params.id);
-    res.set({
-      'Content-Type': file.file_mimetype
-    });
-    res.sendFile(path.join(__dirname, '..', file.file_path));
-  } catch (error) {
-    res.status(400).send('Error while downloading file. Try again later.');
-  }
+router.get('/download/:dir/:id', async (req, res) => {
+  const file = await File.findById(req.params.id);
+  res.set({
+    'Content-Type': file.file_mimetype
+  });
+  res.sendFile(path.join(__dirname, '..', file.file_path));
 });
 
 module.exports = router;

@@ -8,15 +8,13 @@ const fileSchema = mongoose.Schema(
       required: true,
       trim: true
     },
-    label: {
+    groupType: {
       type: String,
       enum: ['forOther', 'forMe', 'forBoxes'],
       required: true,
       trim: true
     },
-    emailArray: [{
-      type: String
-    }]
+    emailArray: [String]
   },
   {
     timestamps: true

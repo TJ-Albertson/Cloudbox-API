@@ -13,11 +13,11 @@ const fileSchema = mongoose.Schema(
       required: true,
       trim: true
     },
-    file_path: {
+    filePath: {
       type: String,
       required: true
     },
-    file_mimetype: {
+    fileMimetype: {
       type: String,
       required: true
     }
