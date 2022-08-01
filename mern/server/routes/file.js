@@ -1,9 +1,13 @@
 const path = require('path');
 const express = require('express');
 const multer = require('multer');
+
 const File = require('../models/fileModel');
+const emailGroup = require("../models/emailGroupModel")
+
 const router = express.Router();
 const fs = require('fs-extra');
+const verifyJWT = require("../models/verifyJWT")
 
 //single list of files in file system. hierarchy in mongodb
 
@@ -58,9 +62,10 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 //change to get by id
-router.get('/getAllFiles', async (req, res) => {
+router.get('/getFiles', async (req, res) => {
   //sorts alphabeticaly
-  const files = await File.find({}).sort({title:1})
+  console.log("email: " + req.params.email)
+  const files = await File.find({ ownerEmail: req.email }).sort({title:1})
   res.send(files);
 });
 
