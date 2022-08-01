@@ -9,9 +9,9 @@ const verifyJWT = require("../models/verifyJWT")
 
 router.get("/isLoggedIn", verifyJWT, async (req, res) => {
 
-    const emailsForBoxes = await emailGroup.find({ownerEmail: req.user.email, groupType: "forBoxes"})
+    const emailGroups = await emailGroup.find({ownerEmail: req.user.email})
 
-    return res.json({isLoggedIn: true, email: req.user.email, emailsForBoxes})
+    return res.json({isLoggedIn: true, email: req.user.email, emailGroups})
 })  
 
 //For frontend to check if email is taken. For login that doesn't ask if register/login
@@ -42,27 +42,14 @@ router.post("/register", async (req, res) => {
             password: user.password,
         })
 
-        const groupForMe = new emailGroup ({
+        const group = new emailGroup ({
             ownerEmail: user.email,
-            groupType: "forMe",
-            emailArray: [user.email]
-            
-        })
-
-        const groupForBoxes = new emailGroup ({
-            ownerEmail: user.email,
-            groupType: "forBoxes",
-            emailArray: [user.email]
-        })
-
-        const groupForOther = new emailGroup ({
-            ownerEmail: user.email,
-            groupType: "forOther",
+            boxArray: [user.email],
+            emailArray: [user.email],
+            shareArray: []
         })
         
-        groupForBoxes.save()
-        groupForMe.save()
-        groupForOther.save()
+        group.save()
         dbUser.save()
         //need to create new directory
         
