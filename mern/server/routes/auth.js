@@ -10,7 +10,6 @@ const verifyJWT = require("../models/verifyJWT")
 router.get("/isLoggedIn", verifyJWT, async (req, res) => {
 
     const emailGroups = await emailGroup.find({ownerEmail: req.user.email})
-
     return res.json({isLoggedIn: true, email: req.user.email, emailGroups})
 })  
 

@@ -7,10 +7,11 @@ const emailGroup = require("../models/emailGroupModel")
 
 const router = express.Router();
 const fs = require('fs-extra');
+
+//add to all routes in future
 const verifyJWT = require("../models/verifyJWT")
 
 //single list of files in file system. hierarchy in mongodb
-
 const upload = multer({
   storage: multer.diskStorage({
     destination(req, file, cb) {
@@ -48,13 +49,14 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     return res.json({isNameTaken: true})
   }
 
-
   fs.move("./files/temp/" + fileName, "./files/" + ownerEmail + '/' + fileName)
+  const newPath = "./files/" + ownerEmail + '/' + fileName
 
+  //get rid of file path
   const file = new File({
     ownerEmail,
     fileName,
-    filePath: path,
+    filePath: newPath,
     fileMimetype: mimetype
   });
   await file.save();
@@ -62,19 +64,18 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 //change to get by id
-router.get('/getFiles', async (req, res) => {
+router.get('/getFiles/:email', async (req, res) => {
   //sorts alphabeticaly
-  console.log("email: " + req.params.email)
-  const files = await File.find({ ownerEmail: req.email }).sort({title:1})
+  const files = await File.find({ ownerEmail: req.params.email }).sort({title:1})
   res.send(files);
 });
 
-router.get('/download/:dir/:id', async (req, res) => {
+router.get('/download/:email/:id', async (req, res) => {
   const file = await File.findById(req.params.id);
   res.set({
-    'Content-Type': file.file_mimetype
+    'Content-Type': file.fileMimetype
   });
-  res.sendFile(path.join(__dirname, '..', file.file_path));
+  res.sendFile(path.join(__dirname, '..', file.filePath));
 });
 
 module.exports = router;
