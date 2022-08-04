@@ -3,7 +3,7 @@ const express = require('express');
 const multer = require('multer');
 
 const File = require('../models/fileModel');
-const emailGroup = require("../models/emailGroupModel")
+const emailGroups = require("../models/emailGroupModel")
 
 const router = express.Router();
 const fs = require('fs-extra');
