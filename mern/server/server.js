@@ -15,6 +15,7 @@ app.use(express.json());
 
 app.use('/', require('./routes/auth.js'));
 app.use('/', require('./routes/file.js'));
+app.use('/', require('./routes/group.js'));
 
 
 mongoose.set('useFindAndModify', false);

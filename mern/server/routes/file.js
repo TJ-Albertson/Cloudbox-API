@@ -1,11 +1,9 @@
-const path = require('path');
 const express = require('express');
-const multer = require('multer');
-
-const File = require('../models/fileModel');
-const emailGroups = require("../models/emailGroupModel")
-
 const router = express.Router();
+
+const path = require('path');
+const multer = require('multer');
+const File = require('../models/fileModel');
 const fs = require('fs-extra');
 
 //add to all routes in future

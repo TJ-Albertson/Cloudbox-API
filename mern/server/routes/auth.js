@@ -14,8 +14,8 @@ router.get("/isLoggedIn", verifyJWT, async (req, res) => {
 })  
 
 //For frontend to check if email is taken. For login that doesn't ask if register/login
-router.post("/isEmailTaken", async (req, res, next) => {
-    
+router.post("/isEmailTaken", async (req, res) => {
+
     const user = req.body
     const takenEmail = await User.findOne({email: user.email})
     if (takenEmail) {
@@ -51,7 +51,6 @@ router.post("/register", async (req, res) => {
         
         group.save()
         dbUser.save()
-        //need to create new directory
         
         res.json({message: "Success"})
     }
