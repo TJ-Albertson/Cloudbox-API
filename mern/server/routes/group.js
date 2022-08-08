@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-const emailGroups = require("../models/emailGroupModel")
+const emailGroup = require("../models/emailGroupModel")
 
 router.post("/:email/addEmail", async (req, res) => {
     
@@ -9,22 +9,27 @@ router.post("/:email/addEmail", async (req, res) => {
 
     const ownerEmail = req.params.email
     const shareEmail = req.body.data
-    
-    console.log({ownerEmail, shareEmail})
+
     //add shareEmail to ownerEmail -> shareArray
     //add shareEmail to shareEmail -> emailArray
-    
-    emailGroups.updateOne(
+
+    const shareExist = await emailGroup.findOne({ownerEmail : shareEmail}) 
+
+    if(!shareExist) {
+        return res.json({emailExist: false})
+    }
+
+    const owner = await emailGroup.updateOne(
         { ownerEmail : ownerEmail },
         { $addToSet : { shareArray : shareEmail } }
     )
 
-    emailGroups.updateOne(
+    const share = await emailGroup.updateOne(
         { ownerEmail : shareEmail },
-        { $addToSet : { emailArray : shareEmail } }
+        { $addToSet : { emailArray : ownerEmail } }
     )
 
-    res.json("request made")
+    console.log("made it")
 })
 
 module.exports = router;
