@@ -39,23 +39,24 @@ const upload = multer({
 //need to add auto rename title if matching
 router.post('/upload', upload.single('file'), async (req, res) => {
 
-  const { fileName, ownerEmail } = req.body;
-  const { path, mimetype } = req.file;
+  const { name, owner, size } = req.body;
+  const { mimetype } = req.file;
 
-  const takenFileName = await File.findOne({ fileName: fileName})
+  const takenFileName = await File.findOne({ name: name})
   if (takenFileName) {
+    //need to figure out way to delete file. it still gets saved in temp
     return res.json({isNameTaken: true})
   }
 
-  fs.move("./files/temp/" + fileName, "./files/" + ownerEmail + '/' + fileName)
-  const newPath = "./files/" + ownerEmail + '/' + fileName
+  fs.move("./files/temp/" + name, "./files/" + owner + '/' + name)
+  const path = "./files/" + owner + '/' + name
 
-  //get rid of file path
   const file = new File({
-    ownerEmail,
-    fileName,
-    filePath: newPath,
-    fileMimetype: mimetype
+    owner,
+    name,
+    size,
+    path: path,
+    mimeType: mimetype
   });
   await file.save();
   res.send('file uploaded successfully.');
@@ -63,17 +64,16 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
 //change to get by id
 router.get('/getFiles/:email', async (req, res) => {
-  //sorts alphabeticaly
-  const files = await File.find({ ownerEmail: req.params.email }).sort({title:1})
+  const files = await File.find({ owner: req.params.email }).sort({title:1})
   res.send(files);
 });
 
 router.get('/download/:email/:id', async (req, res) => {
   const file = await File.findById(req.params.id);
   res.set({
-    'Content-Type': file.fileMimetype
+    'Content-Type': file.mimeType
   });
-  res.sendFile(path.join(__dirname, '..', file.filePath));
+  res.sendFile(path.join(__dirname, '..', file.path));
 });
 
 module.exports = router;

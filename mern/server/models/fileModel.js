@@ -3,21 +3,26 @@ const mongoose = require('mongoose');
 //add user id in schema
 const fileSchema = mongoose.Schema(
   {
-    ownerEmail: {
+    //fileOwner
+    owner: {
       type: String,
       required: true,
       trim: true
     },
-    fileName: {
+    name: {
       type: String,
       required: true,
       trim: true
     },
-    filePath: {
+    size: {
+      type: String, 
+      require: true
+    },
+    path: {
       type: String,
       required: true
     },
-    fileMimetype: {
+    mimeType: {
       type: String,
       required: true
     }

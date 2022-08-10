@@ -35,4 +35,14 @@ router.post("/:email/removeEmail", async (req, res) => {
     )
 })
 
+router.post("/:email/removeShareEmail", async (req, res) => {
+    const ownerEmail = req.params.email
+    const removeEmail = req.body.data
+
+    const remove = await emailGroup.updateOne(
+        { ownerEmail : ownerEmail },
+        { $pull : { boxArray : removeEmail}}
+    )
+})
+
 module.exports = router;
