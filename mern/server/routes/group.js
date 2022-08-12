@@ -25,7 +25,6 @@ router.post("/:email/addEmail", async (req, res) => {
     )
 })
 
-
 router.post("/:email/removeShareEmail", async (req, res) => {
     const ownerEmail = req.params.email
     const removeEmail = req.body.data
@@ -41,11 +40,9 @@ router.post("/:email/removeShareEmails", async (req, res) => {
 
 })
 
-
 router.post("/:email/addBoxes", async (req, res) => {
 
 
 })
-
 
 module.exports = router;
