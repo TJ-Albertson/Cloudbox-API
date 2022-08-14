@@ -3,7 +3,7 @@ const router = express.Router()
 
 const emailGroup = require("../models/emailGroupModel")
 
-router.post("/:email/addEmail", async (req, res) => {
+router.post("/:email/addShareEmail", async (req, res) => {
 
     const ownerEmail = req.params.email
     const shareEmail = req.body.data
@@ -23,26 +23,42 @@ router.post("/:email/addEmail", async (req, res) => {
         { ownerEmail : shareEmail },
         { $addToSet : { emailArray : ownerEmail } }
     )
-})
 
-router.post("/:email/removeShareEmail", async (req, res) => {
-    const ownerEmail = req.params.email
-    const removeEmail = req.body.data
-
-    const remove = await emailGroup.updateOne(
-        { ownerEmail : ownerEmail },
-        { $pull : { boxArray : removeEmail}}
-    )
+    res.send('add request made');
 })
 
 router.post("/:email/removeShareEmails", async (req, res) => {
-    
+    const ownerEmail = req.params.email
+    const removeEmail = req.body.data
 
+    console.log({ownerEmail, removeEmail})
+
+    const remove = await emailGroup.updateOne(
+        { ownerEmail : ownerEmail },
+        { $pull : { shareArray : { $in: removeEmail } } }
+    )
+
+    const remove2 = await emailGroup.updateOne(
+        { ownerEmail : removeEmail },
+        { $pull : { emailArray : ownerEmail, boxArray : ownerEmail } }
+    )
+    
+    res.send('delete request made');
 })
 
+
 router.post("/:email/addBoxes", async (req, res) => {
+    const ownerEmail = req.params.email
+    const addEmail = req.body.data
 
+    console.log({ownerEmail, addEmail})
 
+    const box = await emailGroup.updateOne(
+        { ownerEmail : ownerEmail },
+        { $addToSet : { boxArray : { $each: addEmail } } }
+    )
+    
+    res.send('add request made');
 })
 
 module.exports = router;
