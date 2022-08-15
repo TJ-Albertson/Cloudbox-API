@@ -1,12 +1,13 @@
 const express = require('express')
 const router = express.Router()
 
+const verifyJWT = require("../models/verifyJWT")
+
 const emailGroup = require("../models/emailGroupModel")
 
-router.get("/", verifyJWT, async (req, res) => {
-
+router.get("/groups", verifyJWT, async (req, res) => {
     const emailGroups = await emailGroup.find({ownerEmail: req.user.email})
-    return res.json({isLoggedIn: true, email: req.user.email, emailGroups})
+    return res.json(emailGroups)
 })  
 
 
@@ -80,6 +81,10 @@ router.post("/:email/removeBox", async (req, res) => {
     )
     
     res.send('delete request made');
+})
+
+router.get("/test", async (req, res) => {
+    res.json('test data');
 })
 
 module.exports = router;

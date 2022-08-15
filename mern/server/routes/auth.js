@@ -8,9 +8,8 @@ const emailGroup = require("../models/emailGroupModel")
 const verifyJWT = require("../models/verifyJWT")
 
 router.get("/isLoggedIn", verifyJWT, async (req, res) => {
-
-    const emailGroups = await emailGroup.find({ownerEmail: req.user.email})
-    return res.json({isLoggedIn: true, email: req.user.email, emailGroups})
+    console.log("login check")
+    return res.json({isLoggedIn: true, email: req.user.email})
 })  
 
 //For frontend to check if email is taken. For login that doesn't ask if register/login
