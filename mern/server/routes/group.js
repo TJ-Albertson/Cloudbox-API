@@ -33,12 +33,12 @@ router.post("/:email/removeShareEmails", async (req, res) => {
 
     console.log({ownerEmail, removeEmail})
 
-    const remove = await emailGroup.updateOne(
+    await emailGroup.updateOne(
         { ownerEmail : ownerEmail },
         { $pull : { shareArray : { $in: removeEmail } } }
     )
 
-    const remove2 = await emailGroup.updateOne(
+    await emailGroup.updateOne(
         { ownerEmail : removeEmail },
         { $pull : { emailArray : ownerEmail, boxArray : ownerEmail } }
     )
@@ -53,12 +53,26 @@ router.post("/:email/addBoxes", async (req, res) => {
 
     console.log({ownerEmail, addEmail})
 
-    const box = await emailGroup.updateOne(
+    await emailGroup.updateOne(
         { ownerEmail : ownerEmail },
         { $addToSet : { boxArray : { $each: addEmail } } }
     )
     
     res.send('add request made');
+})
+
+router.post("/:email/removeBox", async (req, res) => {
+    const ownerEmail = req.params.email
+    const removeEmail = req.body.data
+
+    console.log({ownerEmail, removeEmail})
+
+    const box = await emailGroup.updateOne(
+        { ownerEmail : ownerEmail },
+        { $pull : { boxArray : removeEmail } }
+    )
+    
+    res.send('delete request made');
 })
 
 module.exports = router;
