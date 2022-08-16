@@ -61,8 +61,6 @@ router.post("/:email/addBoxes", async (req, res) => {
     const ownerEmail = req.params.email
     const addEmail = req.body.data
 
-    console.log({ownerEmail, addEmail})
-
     await emailGroup.updateOne(
         { ownerEmail : ownerEmail },
         { $addToSet : { boxArray : { $each: addEmail } } }
@@ -75,8 +73,6 @@ router.post("/:email/addBoxes", async (req, res) => {
 router.post("/:email/removeBox", async (req, res) => {
     const ownerEmail = req.params.email
     const removeEmail = req.body.data
-
-    console.log({ownerEmail, removeEmail})
 
     await emailGroup.updateOne(
         { ownerEmail : ownerEmail },
