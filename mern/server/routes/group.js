@@ -41,6 +41,8 @@ router.post("/:email/removeShareEmails", async (req, res) => {
 
     console.log({ownerEmail, removeEmail})
 
+    
+
     await emailGroup.updateOne(
         { ownerEmail : ownerEmail },
         { $pull : { shareArray : { $in: removeEmail } } }
@@ -66,7 +68,8 @@ router.post("/:email/addBoxes", async (req, res) => {
         { $addToSet : { boxArray : { $each: addEmail } } }
     )
     
-    res.send('add request made');
+    const emailGroups = await emailGroup.find({ownerEmail: ownerEmail})
+    return res.json(emailGroups)
 })
 
 router.post("/:email/removeBox", async (req, res) => {
@@ -79,8 +82,8 @@ router.post("/:email/removeBox", async (req, res) => {
         { ownerEmail : ownerEmail },
         { $pull : { boxArray : removeEmail } }
     )
-    
-    res.send('delete request made');
+    const emailGroups = await emailGroup.find({ownerEmail: ownerEmail})
+    return res.json(emailGroups)
 })
 
 router.get("/test", async (req, res) => {

@@ -8,7 +8,6 @@ const emailGroup = require("../models/emailGroupModel")
 const verifyJWT = require("../models/verifyJWT")
 
 router.get("/isLoggedIn", verifyJWT, async (req, res) => {
-    console.log("login check")
     return res.json({isLoggedIn: true, email: req.user.email})
 })  
 
