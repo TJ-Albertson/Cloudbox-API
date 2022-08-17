@@ -2,14 +2,12 @@ const express = require('express')
 const router = express.Router()
 
 const verifyJWT = require("../models/verifyJWT")
-
 const emailGroup = require("../models/emailGroupModel")
 
 router.get("/groups", verifyJWT, async (req, res) => {
     const emailGroups = await emailGroup.find({ownerEmail: req.user.email})
     return res.json(emailGroups)
 })  
-
 
 router.post("/:email/addShareEmail", async (req, res) => {
 
@@ -31,17 +29,14 @@ router.post("/:email/addShareEmail", async (req, res) => {
         { ownerEmail : shareEmail },
         { $addToSet : { emailArray : ownerEmail } }
     )
-
-    res.send('add request made');
+    
+    const emailGroups = await emailGroup.find({ownerEmail: ownerEmail})
+    return res.json(emailGroups)
 })
 
 router.post("/:email/removeShareEmails", async (req, res) => {
     const ownerEmail = req.params.email
     const removeEmail = req.body.data
-
-    console.log({ownerEmail, removeEmail})
-
-    
 
     await emailGroup.updateOne(
         { ownerEmail : ownerEmail },
@@ -52,10 +47,9 @@ router.post("/:email/removeShareEmails", async (req, res) => {
         { ownerEmail : removeEmail },
         { $pull : { emailArray : ownerEmail, boxArray : ownerEmail } }
     )
-    
-    res.send('delete request made');
+    const emailGroups = await emailGroup.find({ownerEmail: ownerEmail})
+    return res.json(emailGroups)
 })
-
 
 router.post("/:email/addBoxes", async (req, res) => {
     const ownerEmail = req.params.email
