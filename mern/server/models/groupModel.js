@@ -3,13 +3,13 @@ const mongoose = require('mongoose');
 //for list of emails share data with and list that have shared with them
 const fileSchema = mongoose.Schema(
   {
-    ownerEmail: {
+    email: {
       type: String,
       required: true,
       trim: true
     },
     boxArray: [String],
-    emailArray: [String],
+    accessArray: [String],
     shareArray: [String]
   },
   {

@@ -22,7 +22,6 @@ const checkJwt = auth({
 
 app.use(checkJwt)
 
-app.use('/', require('./routes/auth.js'));
 app.use('/', require('./routes/file.js'));
 app.use('/', require('./routes/group.js'));
 
