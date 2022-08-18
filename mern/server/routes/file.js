@@ -1,5 +1,5 @@
 const express = require('express');
-const fileRouter = express.fileRouter();
+const fileRouter = express.Router();
 
 const path = require('path');
 const multer = require('multer');

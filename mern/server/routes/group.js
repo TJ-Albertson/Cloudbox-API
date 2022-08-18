@@ -1,15 +1,23 @@
 const express = require('express')
-const groupRouter = express.groupRouter()
+const groupRouter = express.Router()
 
 const emailGroup = require("../models/emailGroupModel")
 
 groupRouter.get("/getGroup", async (req, res) => {
     const email = req.auth.payload['https://example.com/email']
+    console.log(email)
+
+    var query = {},
+        update = { expire: new Date() },
+        options = { upsert: true, new: true, setDefaultsOnInsert: true };
+
+    const group = emailGroup.findOneAndUpdate(query, update, options)
+
     const emailGroups = await emailGroup.find({ownerEmail: email})
     return res.json(emailGroups)
 })  
 
-groupRouter.post("/postShareEmail", async (req, res) => {
+groupRouter.post("/addShareEmail", async (req, res) => {
     const ownerEmail = req.auth.payload['https://example.com/email']
     const shareEmail = req.body.data
 
@@ -33,7 +41,7 @@ groupRouter.post("/postShareEmail", async (req, res) => {
     return res.json(emailGroups)
 })
 
-groupRouter.post("/deleteShareEmails", async (req, res) => {
+groupRouter.post("/removeShareEmail", async (req, res) => {
     const ownerEmail = req.auth.payload['https://example.com/email']
     const removeEmail = req.body.data
 
@@ -50,7 +58,7 @@ groupRouter.post("/deleteShareEmails", async (req, res) => {
     return res.json(emailGroups)
 })
 
-groupRouter.post("/postBoxes", async (req, res) => {
+groupRouter.post("/addBox", async (req, res) => {
     const ownerEmail = req.auth.payload['https://example.com/email']
     const addEmail = req.body.data
 
