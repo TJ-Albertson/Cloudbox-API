@@ -3,13 +3,13 @@ const groupRouter = express.groupRouter()
 
 const emailGroup = require("../models/emailGroupModel")
 
-groupRouter.get("/groups", async (req, res) => {
+groupRouter.get("/getGroup", async (req, res) => {
     const email = req.auth.payload['https://example.com/email']
     const emailGroups = await emailGroup.find({ownerEmail: email})
     return res.json(emailGroups)
 })  
 
-groupRouter.post("/addShareEmail", async (req, res) => {
+groupRouter.post("/postShareEmail", async (req, res) => {
     const ownerEmail = req.auth.payload['https://example.com/email']
     const shareEmail = req.body.data
 
@@ -33,7 +33,7 @@ groupRouter.post("/addShareEmail", async (req, res) => {
     return res.json(emailGroups)
 })
 
-groupRouter.post("/removeShareEmails", async (req, res) => {
+groupRouter.post("/deleteShareEmails", async (req, res) => {
     const ownerEmail = req.auth.payload['https://example.com/email']
     const removeEmail = req.body.data
 
@@ -50,7 +50,7 @@ groupRouter.post("/removeShareEmails", async (req, res) => {
     return res.json(emailGroups)
 })
 
-groupRouter.post("/addBoxes", async (req, res) => {
+groupRouter.post("/postBoxes", async (req, res) => {
     const ownerEmail = req.auth.payload['https://example.com/email']
     const addEmail = req.body.data
 
@@ -63,7 +63,7 @@ groupRouter.post("/addBoxes", async (req, res) => {
     return res.json(emailGroups)
 })
 
-groupRouter.post("/removeBox", async (req, res) => {
+groupRouter.post("/deleteBox", async (req, res) => {
     const ownerEmail = req.auth.payload['https://example.com/email']
     const removeEmail = req.body.data
 
