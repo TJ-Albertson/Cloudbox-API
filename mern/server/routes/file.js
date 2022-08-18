@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+const fileRouter = express.fileRouter();
 
 const path = require('path');
 const multer = require('multer');
@@ -37,7 +37,7 @@ const upload = multer({
 
 //also auto delete file if error uploading to mongo
 //need to add auto rename title if matching
-router.post('/upload', upload.single('file'), async (req, res) => {
+fileRouter.post('/upload', upload.single('file'), async (req, res) => {
 
   const { name, owner, size } = req.body;
   const { mimetype } = req.file;
@@ -63,12 +63,12 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 //change to get by id
-router.get('/getFiles/:email', async (req, res) => {
+fileRouter.get('/getFiles/:email', async (req, res) => {
   const files = await File.find({ owner: req.params.email }).sort({title:1})
   res.send(files);
 });
 
-router.get('/download/:email/:id', async (req, res) => {
+fileRouter.get('/download/:email/:id', async (req, res) => {
   const file = await File.findById(req.params.id);
   res.set({
     'Content-Type': file.mimeType
@@ -76,4 +76,4 @@ router.get('/download/:email/:id', async (req, res) => {
   res.sendFile(path.join(__dirname, '..', file.path));
 });
 
-module.exports = router;
+module.exports = fileRouter;

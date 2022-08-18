@@ -1,17 +1,16 @@
 const express = require('express')
-const router = express.Router()
+const groupRouter = express.groupRouter()
 
-const verifyJWT = require("../models/verifyJWT")
 const emailGroup = require("../models/emailGroupModel")
 
-router.get("/groups", verifyJWT, async (req, res) => {
-    const emailGroups = await emailGroup.find({ownerEmail: req.user.email})
+groupRouter.get("/groups", async (req, res) => {
+    const email = req.auth.payload['https://example.com/email']
+    const emailGroups = await emailGroup.find({ownerEmail: email})
     return res.json(emailGroups)
 })  
 
-router.post("/:email/addShareEmail", async (req, res) => {
-
-    const ownerEmail = req.params.email
+groupRouter.post("/addShareEmail", async (req, res) => {
+    const ownerEmail = req.auth.payload['https://example.com/email']
     const shareEmail = req.body.data
 
     const shareExist = await emailGroup.findOne({ownerEmail : shareEmail}) 
@@ -34,8 +33,8 @@ router.post("/:email/addShareEmail", async (req, res) => {
     return res.json(emailGroups)
 })
 
-router.post("/:email/removeShareEmails", async (req, res) => {
-    const ownerEmail = req.params.email
+groupRouter.post("/removeShareEmails", async (req, res) => {
+    const ownerEmail = req.auth.payload['https://example.com/email']
     const removeEmail = req.body.data
 
     await emailGroup.updateOne(
@@ -51,8 +50,8 @@ router.post("/:email/removeShareEmails", async (req, res) => {
     return res.json(emailGroups)
 })
 
-router.post("/:email/addBoxes", async (req, res) => {
-    const ownerEmail = req.params.email
+groupRouter.post("/addBoxes", async (req, res) => {
+    const ownerEmail = req.auth.payload['https://example.com/email']
     const addEmail = req.body.data
 
     await emailGroup.updateOne(
@@ -64,8 +63,8 @@ router.post("/:email/addBoxes", async (req, res) => {
     return res.json(emailGroups)
 })
 
-router.post("/:email/removeBox", async (req, res) => {
-    const ownerEmail = req.params.email
+groupRouter.post("/removeBox", async (req, res) => {
+    const ownerEmail = req.auth.payload['https://example.com/email']
     const removeEmail = req.body.data
 
     await emailGroup.updateOne(
@@ -76,8 +75,4 @@ router.post("/:email/removeBox", async (req, res) => {
     return res.json(emailGroups)
 })
 
-router.get("/test", async (req, res) => {
-    res.json('test data');
-})
-
-module.exports = router;
+module.exports = groupRouter;

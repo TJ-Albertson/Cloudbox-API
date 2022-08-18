@@ -15,29 +15,16 @@ app.use(bodyParser.json(), urlEncodedParser)
 app.use(cors());
 app.use(express.json());
 
-app.use('/', require('./routes/auth.js'));
-app.use('/', require('./routes/file.js'));
-app.use('/', require('./routes/group.js'));
-
 const checkJwt = auth({
   audience: 'http://localhost:5000',
   issuerBaseURL: `https://dev-5c9085dy.us.auth0.com/`,
 });
 
+app.use(checkJwt)
 
-app.get('/api/private', checkJwt, function(req, res) {
-  console.log(req.auth.payload['https://example.com/email'])
-  res.json({
-    message: 'Hello from a private endpoint! You need to be authenticated to see this.'
-  });
-});
-
-app.get('/api/public', function(req, res) {
-  res.json({
-    message: 'Hello from a public endpoint! You don\'t need to be authenticated to see this.'
-  });
-});
-
+app.use('/', require('./routes/auth.js'));
+app.use('/', require('./routes/file.js'));
+app.use('/', require('./routes/group.js'));
 
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
