@@ -24,10 +24,11 @@ const checkJwt = auth({
   issuerBaseURL: `https://dev-5c9085dy.us.auth0.com/`,
 });
 
+
 app.get('/api/private', checkJwt, function(req, res) {
-  var userId = req.user['http://localhost:5000/email'];
+  console.log(req.auth.payload['https://example.com/email'])
   res.json({
-    message: 'Hello from a private endpoint! You need to be authenticated to see this.' + userId
+    message: 'Hello from a private endpoint! You need to be authenticated to see this.'
   });
 });
 
