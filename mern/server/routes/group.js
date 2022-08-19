@@ -8,7 +8,7 @@ groupRouter.get("/getGroup", async (req, res) => {
     const group = await groupModel.findOne({email: email})
     
     if(group) {
-        return res.json(group)
+        return res.json(group)      
     } else {
         let newGroup = new groupModel({ 
             email: email,
