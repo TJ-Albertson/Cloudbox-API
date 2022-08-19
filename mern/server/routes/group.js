@@ -4,6 +4,7 @@ const groupRouter = express.Router()
 const groupModel = require("../models/groupModel")
 
 groupRouter.get("/getGroup", async (req, res) => {
+   
     const email = req.auth.payload['https://example.com/email']
     const group = await groupModel.findOne({email: email})
     
@@ -21,8 +22,11 @@ groupRouter.get("/getGroup", async (req, res) => {
 })  
 
 groupRouter.post("/addShareEmail", async (req, res) => {
+    
     const ownerEmail = req.auth.payload['https://example.com/email']
-    const shareEmail = req.body.data
+    const shareEmail = req.body
+
+    console.log({ownerEmail, shareEmail})
 
     const shareExist = await groupModel.findOne({ownerEmail : shareEmail}) 
 
@@ -40,7 +44,7 @@ groupRouter.post("/addShareEmail", async (req, res) => {
         { $addToSet : { emailArray : ownerEmail } }
     )
     
-    const group = await emailGroup.find({ownerEmail: ownerEmail})
+    const group = await groupModel.find({ownerEmail: ownerEmail})
     return res.json(group)
 })
 
