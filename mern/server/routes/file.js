@@ -63,8 +63,9 @@ fileRouter.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 //change to get by id
-fileRouter.get('/getFiles/:email', async (req, res) => {
-  const files = await File.find({ owner: req.params.email }).sort({title:1})
+fileRouter.get('/getFileList', async (req, res) => {
+  const email = req.auth.payload['https://example.com/email']
+  const files = await File.find({ owner: email }).sort({title:1})
   res.send(files);
 });
 
