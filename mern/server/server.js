@@ -10,14 +10,14 @@ const { auth } = require('express-oauth2-jwt-bearer');
 const port = process.env.PORT || 5000;
 require("dotenv").config({ path: "./config.env" });
 
-const urlEncodedParser = bodyParser.urlencoded({ extended: false })
+const urlEncodedParser = bodyParser.urlencoded({ extended: true })
 app.use(bodyParser.json(), urlEncodedParser)
 app.use(cors());
 app.use(express.json());
 
 const checkJwt = auth({
   audience: 'http://localhost:5000',
-  issuerBaseURL: `https://dev-5c9085dy.us.auth0.com/`,
+  issuerBaseURL: 'https://dev-5c9085dy.us.auth0.com/',
 });
 
 app.use(checkJwt)

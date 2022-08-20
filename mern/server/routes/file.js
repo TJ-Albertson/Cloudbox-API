@@ -39,6 +39,8 @@ const upload = multer({
 //need to add auto rename title if matching
 fileRouter.post('/upload', upload.single('file'), async (req, res) => {
 
+  console.log(req.body)
+
   const { name, owner, size } = req.body;
   const { mimetype } = req.file;
 

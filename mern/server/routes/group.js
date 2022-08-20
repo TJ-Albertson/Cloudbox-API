@@ -24,23 +24,23 @@ groupRouter.get("/getGroup", async (req, res) => {
 groupRouter.post("/addShareEmail", async (req, res) => {
     
     const ownerEmail = req.auth.payload['https://example.com/email']
-    const shareEmail = req.body
+    const { shareEmail } = req.body
 
     console.log({ownerEmail, shareEmail})
 
-    const shareExist = await groupModel.findOne({ownerEmail : shareEmail}) 
+    const shareExist = await groupModel.findOne({email: shareEmail}) 
 
     if(!shareExist) {
         return res.json({emailExist: false})
     }
 
     await groupModel.updateOne(
-        { ownerEmail : ownerEmail },
+        { email : ownerEmail },
         { $addToSet : { shareArray : shareEmail } }
     )
 
     await groupModel.updateOne(
-        { ownerEmail : shareEmail },
+        { email : shareEmail },
         { $addToSet : { emailArray : ownerEmail } }
     )
     
@@ -53,12 +53,12 @@ groupRouter.post("/removeShareEmail", async (req, res) => {
     const removeEmail = req.body.data
 
     await groupModel.updateOne(
-        { ownerEmail : ownerEmail },
+        { email : ownerEmail },
         { $pull : { shareArray : { $in: removeEmail } } }
     )
 
     await groupModel.updateOne(
-        { ownerEmail : removeEmail },
+        { email : removeEmail },
         { $pull : { emailArray : ownerEmail, boxArray : ownerEmail } }
     )
     const group = await groupModel.find({ownerEmail: ownerEmail})
@@ -70,7 +70,7 @@ groupRouter.post("/addBox", async (req, res) => {
     const addEmail = req.body.data
 
     await groupModel.updateOne(
-        { ownerEmail : ownerEmail },
+        { email : ownerEmail },
         { $addToSet : { boxArray : { $each: addEmail } } }
     )
     
