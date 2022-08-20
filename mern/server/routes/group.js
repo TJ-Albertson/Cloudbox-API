@@ -24,7 +24,7 @@ groupRouter.get("/getGroup", async (req, res) => {
 groupRouter.post("/addShareEmail", async (req, res) => {
     
     const ownerEmail = req.auth.payload['https://example.com/email']
-    const { shareEmail } = req.body
+    const shareEmail = req.body.data
 
     console.log({ownerEmail, shareEmail})
 
