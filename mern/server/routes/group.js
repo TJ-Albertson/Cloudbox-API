@@ -22,9 +22,13 @@ groupRouter.get("/getGroup", async (req, res) => {
 })  
 
 groupRouter.post("/addShareEmail", async (req, res) => {
+
+    console.log(req.body)
+    return res.json("bruh")
     
+    /*
     const ownerEmail = req.auth.payload['https://example.com/email']
-    const shareEmail = req.body.data
+    const { shareEmail } = req.body
 
     console.log({ownerEmail, shareEmail})
 
@@ -46,9 +50,14 @@ groupRouter.post("/addShareEmail", async (req, res) => {
     
     const group = await groupModel.find({ownerEmail: ownerEmail})
     return res.json(group)
+    */
 })
 
 groupRouter.post("/removeShareEmail", async (req, res) => {
+
+    console.log(req.body)
+    return res.json("bruh")
+
     const ownerEmail = req.auth.payload['https://example.com/email']
     const removeEmail = req.body.data
 

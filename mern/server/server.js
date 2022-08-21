@@ -6,11 +6,13 @@ const cors = require("cors");
 const bodyParser = require("body-parser")
 
 const { auth } = require('express-oauth2-jwt-bearer');
+var { expressjwt: jwt } = require("express-jwt");
+const jwks = require('jwks-rsa');
 
 const port = process.env.PORT || 5000;
 require("dotenv").config({ path: "./config.env" });
 
-const urlEncodedParser = bodyParser.urlencoded({ extended: true })
+const urlEncodedParser = bodyParser.urlencoded({ extended: false })
 app.use(bodyParser.json(), urlEncodedParser)
 app.use(cors());
 app.use(express.json());
@@ -20,7 +22,21 @@ const checkJwt = auth({
   issuerBaseURL: 'https://dev-5c9085dy.us.auth0.com/',
 });
 
-app.use(checkJwt)
+//app.use(checkJwt)
+
+const jwtCheck = jwt({
+  secret: jwks.expressJwtSecret({
+      cache: true,
+      rateLimit: true,
+      jwksRequestsPerMinute: 5,
+      jwksUri: 'https://dev-5c9085dy.us.auth0.com/.well-known/jwks.json'
+}),
+audience: 'http://localhost:5000',
+issuer: 'https://dev-5c9085dy.us.auth0.com/',
+algorithms: ['RS256']
+});
+
+app.use(jwtCheck);
 
 app.use('/', require('./routes/file.js'));
 app.use('/', require('./routes/group.js'));
