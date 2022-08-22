@@ -22,15 +22,9 @@ groupRouter.get("/getGroup", async (req, res) => {
 })  
 
 groupRouter.post("/addShareEmail", async (req, res) => {
-
-    console.log(req.body)
-    return res.json("bruh")
     
-    /*
     const ownerEmail = req.auth.payload['https://example.com/email']
     const { shareEmail } = req.body
-
-    console.log({ownerEmail, shareEmail})
 
     const shareExist = await groupModel.findOne({email: shareEmail}) 
 
@@ -45,21 +39,16 @@ groupRouter.post("/addShareEmail", async (req, res) => {
 
     await groupModel.updateOne(
         { email : shareEmail },
-        { $addToSet : { emailArray : ownerEmail } }
+        { $addToSet : { accessArray : ownerEmail } }
     )
     
-    const group = await groupModel.find({ownerEmail: ownerEmail})
-    return res.json(group)
-    */
+    return res.json("Share Attempt")
 })
 
 groupRouter.post("/removeShareEmail", async (req, res) => {
 
-    console.log(req.body)
-    return res.json("bruh")
-
     const ownerEmail = req.auth.payload['https://example.com/email']
-    const removeEmail = req.body.data
+    const removeEmail = req.body
 
     await groupModel.updateOne(
         { email : ownerEmail },
@@ -68,34 +57,35 @@ groupRouter.post("/removeShareEmail", async (req, res) => {
 
     await groupModel.updateOne(
         { email : removeEmail },
-        { $pull : { emailArray : ownerEmail, boxArray : ownerEmail } }
+        { $pull : { accessArray : ownerEmail, boxArray : ownerEmail } }
     )
-    const group = await groupModel.find({ownerEmail: ownerEmail})
+    const group = await groupModel.find({email: ownerEmail})
     return res.json(group)
 })
 
 groupRouter.post("/addBox", async (req, res) => {
     const ownerEmail = req.auth.payload['https://example.com/email']
-    const addEmail = req.body.data
+    const addEmail = req.body
 
     await groupModel.updateOne(
         { email : ownerEmail },
         { $addToSet : { boxArray : { $each: addEmail } } }
     )
     
-    const group = await groupModel.find({ownerEmail: ownerEmail})
+    const group = await groupModel.find({email: ownerEmail})
     return res.json(group)
 })
 
-groupRouter.post("/deleteBox", async (req, res) => {
+groupRouter.post("/removeBox", async (req, res) => {
+
     const ownerEmail = req.auth.payload['https://example.com/email']
-    const removeEmail = req.body.data
+    const { removeEmail } = req.body
 
     await groupModel.updateOne(
-        { ownerEmail : ownerEmail },
+        { email : ownerEmail },
         { $pull : { boxArray : removeEmail } }
     )
-    const group = await groupModel.find({ownerEmail: ownerEmail})
+    const group = await groupModel.find({email: ownerEmail})
     return res.json(group)
 })
 

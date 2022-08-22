@@ -42,9 +42,9 @@ fileRouter.post('/upload', upload.single('file'), async (req, res) => {
   const { name, owner, size } = req.body;
   const { mimetype } = req.file;
 
-  const takenFileName = await File.findOne({ name: name})
+  const takenFileName = await File.findOne({owner: owner, name: name})
   if (takenFileName) {
-    //need to figure out way to delete file. it still gets saved in temp
+    //need to delete file. it still gets saved in temp
     return res.json({isNameTaken: true})
   }
 
@@ -59,17 +59,16 @@ fileRouter.post('/upload', upload.single('file'), async (req, res) => {
     mimeType: mimetype
   });
   await file.save();
-  res.send('file uploaded successfully.');
+  res.json('file uploaded successfully.');
 });
 
-//change to get by id
-fileRouter.get('/getFileList', async (req, res) => {
-  const email = req.auth.payload['https://example.com/email']
+fileRouter.get('/getFileList/:email', async (req, res) => {
+  const email = req.params.email
   const files = await File.find({ owner: email }).sort({title:1})
   res.send(files);
 });
 
-fileRouter.get('/download/:email/:id', async (req, res) => {
+fileRouter.get('/downloadFile/:id', async (req, res) => {
   const file = await File.findById(req.params.id);
   res.set({
     'Content-Type': file.mimeType
