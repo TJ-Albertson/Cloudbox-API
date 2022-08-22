@@ -6,8 +6,6 @@ const cors = require("cors");
 const bodyParser = require("body-parser")
 
 const { auth } = require('express-oauth2-jwt-bearer');
-var { expressjwt: jwt } = require("express-jwt");
-const jwks = require('jwks-rsa');
 
 const port = process.env.PORT || 5000;
 require("dotenv").config({ path: "./config.env" });
