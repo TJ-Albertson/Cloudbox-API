@@ -16,8 +16,8 @@ app.use(cors());
 app.use(express.json());
 
 const checkJwt = auth({
-  audience: 'http://localhost:5000',
-  issuerBaseURL: 'https://dev-5c9085dy.us.auth0.com/',
+  audience: process.env.AUDIENCE,
+  issuerBaseURL: process.env.ISSUERBASEURL,
 });
 
 app.use(checkJwt)
