@@ -4,6 +4,7 @@ const fileRouter = express.Router();
 const path = require('path');
 const multer = require('multer');
 const File = require('../models/fileModel');
+const FileTree = require('../models/fileTreeModel');
 const fs = require('fs-extra');
 
 //add to all routes in future
@@ -75,5 +76,37 @@ fileRouter.get('/downloadFile/:id', async (req, res) => {
   });
   res.sendFile(path.join(__dirname, '..', file.path));
 });
+
+fileRouter.post('/setFileList', async (req, res) => {
+  const ownerEmail = req.auth.payload['https://example.com/email']
+  
+  const fileTree = req.body
+
+  const update = await FileTree.findOneAndUpdate({email: ownerEmail}, {fileTree: JSON.stringify(fileTree)}, {upsert: true})
+  res.json("req received")
+})
+
+fileRouter.get('/getFileList', async (req, res) => {
+  const ownerEmail = req.auth.payload['https://example.com/email']
+
+  const fileTree = await FileTree.findOne({email: ownerEmail})
+
+  const object = {
+    name: "main",
+    folders: [],
+    files: []
+  }
+    
+    if(fileTree) {
+      console.log(fileTree.fileTree)
+        return res.json(fileTree)      
+    } else {
+        let newFileTree = new FileTree({ 
+            email: ownerEmail,
+            fileTree: JSON.stringify(object)
+        }).save()
+        return res.json(newFileTree)
+    }
+})
 
 module.exports = fileRouter;
