@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 //add user id in schema
 const fileSchema = mongoose.Schema(
   {
-    //fileOwner
     owner: {
       type: String,
       required: true,
@@ -17,6 +16,10 @@ const fileSchema = mongoose.Schema(
     size: {
       type: String, 
       require: true
+    },
+    directory: {
+      type: String,
+      required: true
     },
     path: {
       type: String,
