@@ -23,8 +23,9 @@ const checkJwt = auth({
 app.use(checkJwt)
 
 
-app.use('/', require('./routes/file.js'));
+app.use('/files', require('./routes/file.js'));
 app.use('/', require('./routes/group.js'));
+//app.use('/group', require('./routes/group.js'));
 
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
