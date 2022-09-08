@@ -15,7 +15,6 @@ const fileSchema = mongoose.Schema(
     },
     size: {
       type: String, 
-      require: true
     },
     directory: {
       type: String,
@@ -23,7 +22,6 @@ const fileSchema = mongoose.Schema(
     },
     path: {
       type: String,
-      required: true
     },
     mimeType: {
       type: String,

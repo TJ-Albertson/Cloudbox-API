@@ -41,8 +41,10 @@ const upload = multer({
 //also auto delete file if error uploading to mongo
 //need to add auto rename title if matching
 fileRouter.post("/upload", upload.single("file"), async (req, res) => {
-  const {  owner, name, size, directory } = req.body;
+  const { owner, name, size, directory } = req.body;
   const { mimetype } = req.file;
+
+  console.log(req.body)
 
   const takenFileName = await File.findOne({ owner: owner, name: name });
   if (takenFileName) {
@@ -63,6 +65,27 @@ fileRouter.post("/upload", upload.single("file"), async (req, res) => {
   });
   await file.save();
   res.json("file uploaded successfully.");
+});
+
+fileRouter.post("/uploadFolder", async (req, res) => {
+  const { owner, name, mimeType, directory } = req.body;
+
+  console.log(req.body)
+
+  const takenFileName = await File.findOne({ owner: owner, name: name, _id: id});
+  if (takenFileName) {
+    //need to delete file. it still gets saved in temp
+    return res.json({ isNameTaken: true });
+  }
+
+  const file = new File({
+    owner,
+    name,
+    directory,
+    mimeType
+  });
+  await file.save();
+  res.json("folder uploaded successfully.");
 });
 
 fileRouter.get("/getFileList/:email", async (req, res) => {
