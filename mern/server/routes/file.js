@@ -6,9 +6,6 @@ const multer = require("multer");
 const File = require("../models/fileModel");
 const fs = require("fs-extra");
 
-//add to all routes in future
-const verifyJWT = require("../models/verifyJWT");
-
 //single list of files in file system. hierarchy in mongodb
 const upload = multer({
   storage: multer.diskStorage({
@@ -39,20 +36,31 @@ const upload = multer({
 
 //also auto delete file if error uploading to mongo
 //need to add auto rename title if matching
-fileRouter.post(upload.single("file"), async (req, res) => {
+fileRouter.post("/", upload.single("file"), async (req, res) => {
   const { owner, name, size, directory } = req.body;
   const { mimetype } = req.file;
 
-  console.log(req.body)
+  console.log(req.body);
 
-  const takenFileName = await File.findOne({ owner: owner, name: name });
+  const takenFileName = await File.findOne({
+    owner: owner,
+    name: name,
+    directory: directory,
+  });
   if (takenFileName) {
     //need to delete file. it still gets saved in temp
     return res.json({ isNameTaken: true });
   }
 
-  fs.move("./files/temp/" + name, "./files/" + owner + "/" + name);
-  const path = "./files/users/" + owner + "/" + name;
+  const crypto = require("crypto");
+  const buf = crypto.randomBytes(15);
+
+  fs.move(
+    "./files/temp/" + name,
+    "./files/" + owner + "/" + name + "_" + buf.toString("hex")
+  );
+  const path =
+    "./files/users/" + owner + "/" + name + "_" + buf.toString("hex");
 
   const file = new File({
     owner,
@@ -66,16 +74,17 @@ fileRouter.post(upload.single("file"), async (req, res) => {
   res.json("file uploaded successfully.");
 });
 
-
-
-fileRouter.post("/uploadFolder", async (req, res) => {
+fileRouter.post("/folder", async (req, res) => {
   const { owner, name, mimeType, directory } = req.body;
 
-  console.log(req.body)
+  console.log(req.body);
 
-  const takenFileName = await File.findOne({ owner: owner, name: name, directory: directory});
+  const takenFileName = await File.findOne({
+    owner: owner,
+    name: name,
+    directory: directory,
+  });
   if (takenFileName) {
-    //need to delete file. it still gets saved in temp
     return res.json({ isNameTaken: true });
   }
 
@@ -83,34 +92,38 @@ fileRouter.post("/uploadFolder", async (req, res) => {
     owner,
     name,
     directory,
-    mimeType
+    mimeType,
   });
   await file.save();
   res.json("folder uploaded successfully.");
 });
 
+//get file list based on email
 fileRouter.get("/:email", async (req, res) => {
   const email = req.params.email;
   const files = await File.find({ owner: email }).sort({ title: 1 });
   res.send(files);
 });
 
+//get single file
 fileRouter.get("/:id", async (req, res) => {
   const file = await File.findById(req.params.id);
   res.set({
     "Content-Type": file.mimeType,
   });
   res.sendFile(path.join(__dirname, "..", file.path));
-
-  fileRouter.get("/:id", async (req, res) => {
-    const file = await File.findById(req.params.id);
-    res.set({
-      "Content-Type": file.mimeType,
-    });
-    res.sendFile(path.join(__dirname, "..", file.path));
-  });
 });
 
+//rename file
+fileRouter.patch("/", async (req, res) => {
+  const file = await File.findById(req.params.id);
+  res.set({
+    "Content-Type": file.mimeType,
+  });
+  res.sendFile(path.join(__dirname, "..", file.path));
+});
+
+//delete file
 fileRouter.delete("/:id", async (req, res) => {
   const file = await File.findById(req.params.id);
   res.set({
@@ -118,7 +131,5 @@ fileRouter.delete("/:id", async (req, res) => {
   });
   res.sendFile(path.join(__dirname, "..", file.path));
 });
-
-
 
 module.exports = fileRouter;

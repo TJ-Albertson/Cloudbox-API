@@ -21,13 +21,13 @@ userRouter.get("/groups", async (req, res) => {
   const email = req.auth.payload["https://example.com/email"];
   const user = await userModel.findOne({ email: email });
 
-  
-
-  if (userModel) {
+  if (user) {
     return res.json();
   } else {
     let newUser = new userModel({
       email: email,
+      bio: "",
+      profilePicturePath: "",
       boxArray: [email],
       accessArray: [email],
       shareArray: [],
