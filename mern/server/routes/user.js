@@ -36,14 +36,13 @@ userRouter.get("/groups", async (req, res) => {
 
 userRouter.patch("/groups", async (req, res) => {
   const email = req.auth.payload["https://example.com/email"];
-  const { type, targetEmail, desire } = req.body;
+  console.log(req.body)
+  const { array, targetEmail, desire } = req.body;
 
   const targetUser = await User.findOne({ email: targetEmail });
 
-  console.log(req.body)
-
   if (desire == "add") {
-    if (type == "share") {
+    if (array == "share") {
       if (!targetUser) {
         return res.json({ emailExist: false });
       }
@@ -59,7 +58,7 @@ userRouter.patch("/groups", async (req, res) => {
       );
 
       return res.json("add share email attempt made");
-    } else if (type == "box") {
+    } else if (array == "box") {
       await User.updateOne(
         { email: email },
         { $addToSet: { boxArray: { $each: targetEmail } } }
@@ -67,7 +66,7 @@ userRouter.patch("/groups", async (req, res) => {
       return res.json("add box email attempt made");
     }
   } else if (desire == "delete") {
-    if (type == "share") {
+    if (array == "share") {
       await User.updateOne(
         { email: email },
         { $pull: { shareArray: { $in: targetEmail } } }
@@ -78,7 +77,7 @@ userRouter.patch("/groups", async (req, res) => {
         { $pull: { accessArray: email, boxArray: email } }
       );
       return res.json("delete share email/s attempt made");
-    } else if (type == "box") {
+    } else if (array == "box") {
       await User.updateOne(
         { email: email },
         { $pull: { boxArray: targetEmail } }

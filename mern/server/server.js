@@ -10,7 +10,7 @@ const { auth } = require('express-oauth2-jwt-bearer');
 const port = process.env.PORT || 5000;
 require("dotenv").config({ path: "./config.env" });
 
-const urlEncodedParser = bodyParser.urlencoded({ extended: false })
+const urlEncodedParser = bodyParser.urlencoded({ extended: true })
 app.use(bodyParser.json(), urlEncodedParser)
 app.use(cors());
 app.use(express.json());
