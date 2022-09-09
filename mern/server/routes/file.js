@@ -121,7 +121,15 @@ fileRouter.patch("/", async (req, res) => {
 
 //delete file
 fileRouter.delete("/:id", async (req, res) => {
+  console.log("delete req")
+  const file = await File.findById(req.params.id);
 
+  console.log(path.join(__dirname, "..", file.path))
+  
+  await File.deleteOne({ _id: req.params.id})
+  fs.remove(path.join(__dirname, "..", file.path))
+  
+  res.json("Delete attempt")
 });
 
 module.exports = fileRouter;
