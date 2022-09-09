@@ -5,7 +5,7 @@ const User = require("../models/userModel");
 
 //user
 userRouter.get("/", async (req, res) => {
-    const user = await userModel.findOne({ email: email });
+    const user = await User.findOne({ email: email });
   res.send("get user info");
 });
 
@@ -38,9 +38,9 @@ userRouter.patch("/groups", async (req, res) => {
   const email = req.auth.payload["https://example.com/email"];
   const { type, targetEmail, desire } = req.body;
 
-  const targetUser = await userModel.findOne({ email: targetEmail });
+  const targetUser = await User.findOne({ email: targetEmail });
 
-  console.log("req")
+  console.log(req.body)
 
   if (desire == "add") {
     if (type == "share") {
@@ -48,19 +48,19 @@ userRouter.patch("/groups", async (req, res) => {
         return res.json({ emailExist: false });
       }
 
-      await userModel.updateOne(
+      await User.updateOne(
         { email: email },
         { $addToSet: { shareArray: targetEmail } }
       );
 
-      await userModel.updateOne(
+      await User.updateOne(
         { email: targetEmail },
         { $addToSet: { accessArray: email } }
       );
 
       return res.json("add share email attempt made");
     } else if (type == "box") {
-      await userModel.updateOne(
+      await User.updateOne(
         { email: email },
         { $addToSet: { boxArray: { $each: targetEmail } } }
       );
@@ -68,18 +68,18 @@ userRouter.patch("/groups", async (req, res) => {
     }
   } else if (desire == "delete") {
     if (type == "share") {
-      await userModel.updateOne(
+      await User.updateOne(
         { email: email },
         { $pull: { shareArray: { $in: targetEmail } } }
       );
 
-      await userModel.updateOne(
+      await User.updateOne(
         { email: targetEmail },
         { $pull: { accessArray: email, boxArray: email } }
       );
       return res.json("delete share email/s attempt made");
     } else if (type == "box") {
-      await userModel.updateOne(
+      await User.updateOne(
         { email: email },
         { $pull: { boxArray: targetEmail } }
       );
