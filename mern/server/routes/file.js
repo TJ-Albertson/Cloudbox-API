@@ -116,20 +116,12 @@ fileRouter.get("/:id", async (req, res) => {
 
 //rename file
 fileRouter.patch("/", async (req, res) => {
-  const file = await File.findById(req.params.id);
-  res.set({
-    "Content-Type": file.mimeType,
-  });
-  res.sendFile(path.join(__dirname, "..", file.path));
+
 });
 
 //delete file
 fileRouter.delete("/:id", async (req, res) => {
-  const file = await File.findById(req.params.id);
-  res.set({
-    "Content-Type": file.mimeType,
-  });
-  res.sendFile(path.join(__dirname, "..", file.path));
+
 });
 
 module.exports = fileRouter;

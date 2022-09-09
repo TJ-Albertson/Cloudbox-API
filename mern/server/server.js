@@ -25,7 +25,7 @@ app.use(checkJwt)
 
 app.use('/files', require('./routes/file.js'));
 app.use('/', require('./routes/group.js'));
-//app.use('/group', require('./routes/group.js'));
+app.use('/user', require('./routes/user.js'));
 
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);

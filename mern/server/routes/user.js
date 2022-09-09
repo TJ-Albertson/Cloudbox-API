@@ -5,29 +5,27 @@ const User = require("../models/userModel");
 
 //user
 userRouter.get("/", async (req, res) => {
+    const user = await userModel.findOne({ email: email });
   res.send("get user info");
 });
 
 userRouter.put("/", async (req, res) => {
+
   res.send("update user info");
 });
 
-userRouter.get("/:email", async (req, res) => {
-  res.send("get other user profile");
-});
-
-//groups
 userRouter.get("/groups", async (req, res) => {
   const email = req.auth.payload["https://example.com/email"];
-  const user = await userModel.findOne({ email: email });
+  const user = await User.findOne({ email: email });
 
   if (user) {
-    return res.json();
+    const {accessArray, boxArray, shareArray} = user
+    return res.json({accessArray, boxArray, shareArray});
   } else {
-    let newUser = new userModel({
+    let newUser = new User({
       email: email,
       bio: "",
-      profilePicturePath: "",
+      profilePicturePath: "/none",
       boxArray: [email],
       accessArray: [email],
       shareArray: [],
@@ -41,6 +39,8 @@ userRouter.patch("/groups", async (req, res) => {
   const { type, targetEmail, desire } = req.body;
 
   const targetUser = await userModel.findOne({ email: targetEmail });
+
+  console.log("req")
 
   if (desire == "add") {
     if (type == "share") {
@@ -88,3 +88,14 @@ userRouter.patch("/groups", async (req, res) => {
   }
   return res.json("data not good")
 });
+
+userRouter.get("/:email", async (req, res) => {
+  res.send("get other user profile");
+});
+
+//groups
+
+
+
+
+module.exports = userRouter;
