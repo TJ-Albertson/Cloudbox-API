@@ -7,6 +7,9 @@ const userSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
+    userName: {
+      type: String,
+    },
     bio: {
       type: String,
     },

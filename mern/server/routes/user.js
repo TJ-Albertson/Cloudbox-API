@@ -6,12 +6,12 @@ const User = require("../models/userModel");
 //user
 userRouter.get("/", async (req, res) => {
     const user = await User.findOne({ email: email });
-  res.send("get user info");
+  res.json("get user info");
 });
 
 userRouter.put("/", async (req, res) => {
 
-  res.send("update user info");
+  res.json("update user info");
 });
 
 userRouter.get("/groups", async (req, res) => {
