@@ -37,19 +37,23 @@ const upload = multer({
 //also auto delete file if error uploading to mongo
 //need to add auto rename title if matching
 fileRouter.post("/", upload.single("file"), async (req, res) => {
-  const { owner, name, size, directory } = req.body;
+  const { owner, size, name, directory } = req.body;
   const { mimetype } = req.file;
 
-  console.log(req.body);
+  let copyName = name
 
-  const takenFileName = await File.findOne({
-    owner: owner,
-    name: name,
-    directory: directory,
-  });
-  if (takenFileName) {
-    //need to delete file. it still gets saved in temp
-    return res.json({ isNameTaken: true });
+  let i = 1;
+  while (true) {
+    const takenFileName = await File.findOne({
+      owner: owner,
+      name: copyName,
+      directory: directory,
+    });
+
+    if (!takenFileName) break;
+
+    copyName = name + " (" + i + ")";
+    i++;
   }
 
   const crypto = require("crypto");
@@ -64,7 +68,7 @@ fileRouter.post("/", upload.single("file"), async (req, res) => {
 
   const file = new File({
     owner,
-    name,
+    name: copyName,
     size,
     directory,
     path: path,
@@ -115,21 +119,19 @@ fileRouter.get("/:id", async (req, res) => {
 });
 
 //rename file
-fileRouter.patch("/", async (req, res) => {
-
-});
+fileRouter.patch("/", async (req, res) => {});
 
 //delete file
 fileRouter.delete("/:id", async (req, res) => {
-  console.log("delete req")
+  console.log("delete req");
   const file = await File.findById(req.params.id);
 
-  console.log(path.join(__dirname, "..", file.path))
-  
-  await File.deleteOne({ _id: req.params.id})
-  fs.remove(path.join(__dirname, "..", file.path))
-  
-  res.json("Delete attempt")
+  console.log(path.join(__dirname, "..", file.path));
+
+  await File.deleteOne({ _id: req.params.id });
+  fs.remove(path.join(__dirname, "..", file.path));
+
+  res.json("Delete attempt");
 });
 
 module.exports = fileRouter;
