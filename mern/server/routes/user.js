@@ -3,27 +3,18 @@ const userRouter = express.Router();
 
 const User = require("../models/userModel");
 
-//user
 userRouter.get("/", async (req, res) => {
-    const user = await User.findOne({ email: email });
-  res.json("get user info");
-});
-
-userRouter.put("/", async (req, res) => {
-
-  res.json("update user info");
-});
-
-userRouter.get("/groups", async (req, res) => {
   const email = req.auth.payload["https://example.com/email"];
   const user = await User.findOne({ email: email });
 
+  console.log(user);
+
   if (user) {
-    const {accessArray, boxArray, shareArray} = user
-    return res.json({accessArray, boxArray, shareArray});
+    return res.json(user);
   } else {
     let newUser = new User({
       email: email,
+      username: "",
       bio: "",
       profilePicturePath: "/none",
       boxArray: [email],
@@ -34,9 +25,22 @@ userRouter.get("/groups", async (req, res) => {
   }
 });
 
+userRouter.put("/", async (req, res) => {
+  const email = req.auth.payload["https://example.com/email"];
+  const { username, profilePicturePath, bio } = req.body;
+
+  await User.updateOne(
+    { email: email },
+    { username },
+    { profilePicturePath },
+    { bio }
+  );
+
+  res.json("update user info");
+});
+
 userRouter.patch("/groups", async (req, res) => {
   const email = req.auth.payload["https://example.com/email"];
-  console.log(req.body)
   const { array, targetEmail, desire } = req.body;
 
   const targetUser = await User.findOne({ email: targetEmail });
@@ -85,16 +89,14 @@ userRouter.patch("/groups", async (req, res) => {
       return res.json("delete box email/s attempt made");
     }
   }
-  return res.json("data not good")
+  return res.json("data not good");
 });
 
 userRouter.get("/:email", async (req, res) => {
-  res.send("get other user profile");
+  const user = await User.findOne({ email: email });
+  const { username, profilePicturePath, bio } = user;
+
+  res.send({ username, profilePicturePath, bio });
 });
-
-//groups
-
-
-
 
 module.exports = userRouter;

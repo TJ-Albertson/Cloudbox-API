@@ -40,6 +40,8 @@ fileRouter.post("/", upload.single("file"), async (req, res) => {
   const { owner, size, name, directory } = req.body;
   const { mimetype } = req.file;
 
+  console.log(req.file)
+
   let copyName = name
 
   let i = 1;
@@ -61,7 +63,7 @@ fileRouter.post("/", upload.single("file"), async (req, res) => {
 
   fs.move(
     "./files/temp/" + name,
-    "./files/" + owner + "/" + name + "_" + buf.toString("hex")
+    "./files/users" + owner + "/" + name + "_" + buf.toString("hex")
   );
   const path =
     "./files/users/" + owner + "/" + name + "_" + buf.toString("hex");
@@ -79,9 +81,7 @@ fileRouter.post("/", upload.single("file"), async (req, res) => {
 });
 
 fileRouter.post("/folder", async (req, res) => {
-  const { owner, name, mimeType, directory } = req.body;
-
-  console.log(req.body);
+  const { owner, name, mimeType, directory } = req.body;;
 
   const takenFileName = await File.findOne({
     owner: owner,
@@ -103,7 +103,7 @@ fileRouter.post("/folder", async (req, res) => {
 });
 
 //get file list based on email
-fileRouter.get("/:email", async (req, res) => {
+fileRouter.get("/list/:email", async (req, res) => {
   const email = req.params.email;
   const files = await File.find({ owner: email }).sort({ title: 1 });
   res.send(files);
@@ -123,7 +123,6 @@ fileRouter.patch("/", async (req, res) => {});
 
 //delete file
 fileRouter.delete("/:id", async (req, res) => {
-  console.log("delete req");
   const file = await File.findById(req.params.id);
 
   console.log(path.join(__dirname, "..", file.path));
