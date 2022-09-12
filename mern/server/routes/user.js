@@ -2,6 +2,7 @@ const express = require("express");
 const userRouter = express.Router();
 
 const User = require("../models/userModel");
+const File = require("../models/fileModel");
 
 userRouter.get("/", async (req, res) => {
   const email = req.auth.payload["https://example.com/email"];
@@ -12,7 +13,7 @@ userRouter.get("/", async (req, res) => {
   if (user) {
     return res.json(user);
   } else {
-    let newUser = new User({
+    let newUser = await new User({
       email: email,
       username: "",
       bio: "",
@@ -21,6 +22,13 @@ userRouter.get("/", async (req, res) => {
       accessArray: [email],
       shareArray: [],
     }).save();
+
+    /*
+    let newFile = new File({
+
+    })
+    */
+
     return res.json(newUser);
   }
 });

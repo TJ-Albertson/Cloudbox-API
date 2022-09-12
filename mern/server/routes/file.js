@@ -17,8 +17,7 @@ const upload = multer({
     },
   }),
   limits: {
-    fileSize: 1000000, // max file size  1MB = 1000000 bytes
-    //               10MB = 10000000
+    fileSize: 1000000, // max file size  1MB = 1000000 bytes, 10MB = 10000000         
   },
   fileFilter(req, file, cb) {
     if (
@@ -39,8 +38,6 @@ const upload = multer({
 fileRouter.post("/", upload.single("file"), async (req, res) => {
   const { owner, size, name, directory } = req.body;
   const { mimetype } = req.file;
-
-  console.log(req.file)
 
   let copyName = name
 
@@ -103,14 +100,14 @@ fileRouter.post("/folder", async (req, res) => {
 });
 
 //get file list based on email
-fileRouter.get("/list/:email", async (req, res) => {
+fileRouter.get("/:email", async (req, res) => {
   const email = req.params.email;
   const files = await File.find({ owner: email }).sort({ title: 1 });
   res.send(files);
 });
 
 //get single file
-fileRouter.get("/:id", async (req, res) => {
+fileRouter.get("/:email/:id", async (req, res) => {
   const file = await File.findById(req.params.id);
   res.set({
     "Content-Type": file.mimeType,
