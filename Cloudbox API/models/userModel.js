@@ -7,13 +7,17 @@ const userSchema = mongoose.Schema(
       required: true,
       trim: true,
     },
-    userName: {
+    username: {
       type: String,
     },
     bio: {
       type: String,
     },
-    profilePicturePath: {
+    userID: {
+      type: String,
+      required: true,
+    },
+    picture: {
       type: String,
       required: true,
     },

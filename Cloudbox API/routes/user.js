@@ -9,13 +9,9 @@ userRouter.get("/", async (req, res) => {
   const email = req.auth.payload["https://example.com/email"];
   const user = await User.findOne({ email: email });
 
-  console.log(user);
-
   if (user) {
     return res.json(user);
   } else {
-
-
     var options = {
       method: "POST",
       url: `${process.env.AUTH0_DOMAIN}/oauth/token`,
@@ -28,51 +24,55 @@ userRouter.get("/", async (req, res) => {
       }),
     };
 
-    const token = await axios
+    await axios
       .request(options)
       .then(function (response) {
-        //console.log(response.data.access_token);
-
         var options = {
-          method: 'GET',
-          url: 'https://dev-5c9085dy.us.auth0.com/api/v2/users/google-oauth2%7C111126926588527267340',
-          headers: {'content-type': 'application/json', authorization: `Bearer ${response.data.access_token}`}
+          method: "GET",
+          url: `https://dev-5c9085dy.us.auth0.com/api/v2/users/${req.auth.payload.sub}`,
+          headers: {
+            "content-type": "application/json",
+            authorization: `Bearer ${response.data.access_token}`,
+          },
         };
-        
-        axios.request(options).then(function (response) {
-          console.log(response.data);
-        }).catch(function (error) {
-          console.error(error);
-        });
-  
+
+        axios
+          .request(options)
+          .then(function (response) {
+            const userMeta = response.data;
+
+            new User({
+              email: email,
+              username: userMeta.name,
+              bio: "",
+              userID: userMeta.user_id,
+              picture: userMeta.picture,
+              boxArray: [email],
+              accessArray: [email],
+              shareArray: [],
+            })
+              .save()
+              .then((savedDoc) => res.json(savedDoc));
+          })
+          .catch(function (error) {
+            console.error(error);
+          });
       })
       .catch(function (error) {
         console.error(error);
       });
-
-      
-    let newUser = await new User({
-      email: email,
-      username: "",
-      bio: "",
-      profilePicturePath: "./public/default_picture.jpg",
-      boxArray: [email],
-      accessArray: [email],
-      shareArray: [],
-    }).save();
-
-    return res.json(newUser);
   }
 });
 
 userRouter.put("/", async (req, res) => {
-  const email = req.auth.payload["https://example.com/email"];
-  const { username, profilePicturePath, bio } = req.body;
+
+  const id = req.auth.payload.sub
+  const { username, picture, bio } = req.body;
 
   await User.updateOne(
-    { email: email },
+    { userID: id },
     { username },
-    { profilePicturePath },
+    { picture },
     { bio }
   );
 
@@ -132,11 +132,12 @@ userRouter.patch("/groups", async (req, res) => {
   return res.json("data not good");
 });
 
-userRouter.get("/:email", async (req, res) => {
-  const user = await User.findOne({ email: email });
-  const { username, profilePicturePath, bio } = user;
+userRouter.get("/email/:email", async (req, res) => {
 
-  res.send({ username, profilePicturePath, bio });
+  const user = await User.findOne({ email: req.params.email });
+  const { username, picture, bio } = user;
+
+  res.json({ username, picture, bio });
 });
 
 module.exports = userRouter;

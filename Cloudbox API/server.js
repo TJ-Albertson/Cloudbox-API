@@ -13,7 +13,7 @@ require("dotenv").config({ path: "./config.env" });
 const urlEncodedParser = bodyParser.urlencoded({ extended: true })
 app.use(bodyParser.json(), urlEncodedParser)
 app.use(cors());
-app.use(express.json());
+//app.use(express.json());
 
 const checkJwt = auth({
   audience: process.env.AUDIENCE,
@@ -23,8 +23,8 @@ const checkJwt = auth({
 app.use(checkJwt)
 
 app.use('/files', require('./routes/file.js'));
-app.use('/', require('./routes/group.js'));
 app.use('/user', require('./routes/user.js'));
+//app.use('/', require('./routes/group.js'));
 
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
