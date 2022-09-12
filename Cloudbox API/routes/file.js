@@ -116,7 +116,15 @@ fileRouter.get("/:email/:id", async (req, res) => {
 });
 
 //rename file
-fileRouter.patch("/", async (req, res) => {});
+fileRouter.patch("/", async (req, res) => {
+  const { newName, id } = req.body
+
+  await File.updateOne(
+    { _id: id },
+    { name: newName }
+  );
+  res.json("File renamed")
+});
 
 //delete file
 fileRouter.delete("/:id", async (req, res) => {

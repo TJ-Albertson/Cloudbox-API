@@ -2,7 +2,8 @@ const express = require("express");
 const userRouter = express.Router();
 
 const User = require("../models/userModel");
-const File = require("../models/fileModel");
+const fs = require("fs-extra");
+const axios = require("axios").default;
 
 userRouter.get("/", async (req, res) => {
   const email = req.auth.payload["https://example.com/email"];
@@ -13,21 +14,52 @@ userRouter.get("/", async (req, res) => {
   if (user) {
     return res.json(user);
   } else {
+
+
+    var options = {
+      method: "POST",
+      url: `${process.env.AUTH0_DOMAIN}/oauth/token`,
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      data: new URLSearchParams({
+        grant_type: "client_credentials",
+        client_id: process.env.AUTH0_CLIENT_ID,
+        client_secret: process.env.AUTH0_CLIENT_SECRET,
+        audience: `${process.env.AUTH0_DOMAIN}/api/v2/`,
+      }),
+    };
+
+    const token = await axios
+      .request(options)
+      .then(function (response) {
+        //console.log(response.data.access_token);
+
+        var options = {
+          method: 'GET',
+          url: 'https://dev-5c9085dy.us.auth0.com/api/v2/users/google-oauth2%7C111126926588527267340',
+          headers: {'content-type': 'application/json', authorization: `Bearer ${response.data.access_token}`}
+        };
+        
+        axios.request(options).then(function (response) {
+          console.log(response.data);
+        }).catch(function (error) {
+          console.error(error);
+        });
+  
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+
+      
     let newUser = await new User({
       email: email,
       username: "",
       bio: "",
-      profilePicturePath: "/none",
+      profilePicturePath: "./public/default_picture.jpg",
       boxArray: [email],
       accessArray: [email],
       shareArray: [],
     }).save();
-
-    /*
-    let newFile = new File({
-
-    })
-    */
 
     return res.json(newUser);
   }
