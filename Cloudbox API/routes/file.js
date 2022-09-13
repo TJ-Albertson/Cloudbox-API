@@ -60,7 +60,7 @@ fileRouter.post("/", upload.single("file"), async (req, res) => {
 
   fs.move(
     "./files/temp/" + name,
-    "./files/users" + owner + "/" + name + "_" + buf.toString("hex")
+    "./files/users/" + owner + "/" + name + "_" + buf.toString("hex")
   );
   const path =
     "./files/users/" + owner + "/" + name + "_" + buf.toString("hex");
