@@ -1,6 +1,6 @@
 # Cloudbox API  
 
-### Routes  
+Routes  
 
 ---
 
