@@ -1,6 +1,6 @@
 # Cloudbox API  
 
-Queries MongoDB Atlas and holds files for Cloudbox App. An Auth0 JWT is required to access all routes.
+Queries MongoDB Atlas and holds files for the Cloudbox App. An Auth0 JWT is required to access all routes.
 
 ## Routes  
 
