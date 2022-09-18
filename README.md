@@ -1,3 +1,5 @@
+[Cloudbox Repository](https://github.com/TJ-Albertson/Cloudbox) | [Cloudbox-Logs Repository](https://github.com/TJ-Albertson/Cloudbox-Logs)
+
 # Cloudbox API  
 
 Node/Express server that queries MongoDB Atlas and holds files for the Cloudbox App. An Auth0 JWT is required to access all routes.
