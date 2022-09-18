@@ -1,6 +1,6 @@
 # Cloudbox API  
 
-Queries mongoDB and holds files for Cloudbox App. An Auth0 JWT is required in the authorization header to access all routes. Most of the routes utilize the email given in the JWT.
+Node/Express server that queries MongoDB Atlas and holds files for the Cloudbox App. An Auth0 JWT is required to access all routes.
 
 ## Routes  
 
