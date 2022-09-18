@@ -17,15 +17,16 @@ const upload = multer({
     },
   }),
   limits: {
-    fileSize: 1000000, // max file size  1MB = 1000000 bytes, 10MB = 10000000         
+    //        10,000,000 = 100MB
+    fileSize: 10000000,        
   },
   fileFilter(req, file, cb) {
     if (
-      !file.originalname.match(/\.(jpeg|jpg|png|pdf|doc|docx|xlsx|xls|txt)$/)
+      !file.originalname.match(/\.(jpeg|jpg|png|pdf|doc|docx|xlsx|xls|txt|mp4)$/)
     ) {
       return cb(
         new Error(
-          "only upload files with jpg, jpeg, png, pdf, doc, docx, xslx, xls format."
+          "only upload files with jpg, jpeg, png, pdf, doc, docx, xslx, xls, mp4 format."
         )
       );
     }
