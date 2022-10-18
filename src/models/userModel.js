@@ -21,8 +21,12 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    accountType: {
+      type: String,
+      required: true, 
+    },
     boxArray: [String],
-    accessArray: [String],
+    accessArray: [{ email: String, color: String }],
     shareArray: [String],
   },
   {

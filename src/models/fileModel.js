@@ -14,7 +14,7 @@ const fileSchema = mongoose.Schema(
       trim: true
     },
     size: {
-      type: String, 
+      type: Number, 
     },
     directory: {
       type: String,

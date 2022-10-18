@@ -1,38 +1,18 @@
 const express = require("express");
 const fileRouter = express.Router();
-
 const path = require("path");
-const multer = require("multer");
+const upload = require("../middleware/multer")
 const File = require("../models/fileModel");
 const fs = require("fs-extra");
 
-//single list of files in file system. hierarchy in mongodb
-const upload = multer({
-  storage: multer.diskStorage({
-    destination(req, file, cb) {
-      cb(null, "./files/temp");
-    },
-    filename(req, file, cb) {
-      cb(null, file.originalname);
-    },
-  }),
-  limits: {
-    //        10,000,000 = 100MB
-    fileSize: 10000000,        
-  },
-  fileFilter(req, file, cb) {
-    if (
-      !file.originalname.match(/\.(jpeg|jpg|png|pdf|doc|docx|xlsx|xls|txt|mp4)$/)
-    ) {
-      return cb(
-        new Error(
-          "only upload files with jpg, jpeg, png, pdf, doc, docx, xslx, xls, mp4 format."
-        )
-      );
-    }
-    cb(undefined, true); // continue with upload
-  },
+
+fileRouter.get("/", async (req, res) => {
+  const files = await File.find({})
+  res.send(files);
 });
+
+//single list of files in file system. hierarchy in mongodb
+
 
 //also auto delete file if error uploading to mongo
 //need to add auto rename title if matching
@@ -40,7 +20,7 @@ fileRouter.post("/", upload.single("file"), async (req, res) => {
   const { owner, size, name, directory } = req.body;
   const { mimetype } = req.file;
 
-  let copyName = name
+  let copyName = name;
 
   let i = 1;
   while (true) {
@@ -79,7 +59,7 @@ fileRouter.post("/", upload.single("file"), async (req, res) => {
 });
 
 fileRouter.post("/folder", async (req, res) => {
-  const { owner, name, mimeType, directory } = req.body;;
+  const { owner, name, mimeType, directory } = req.body;
 
   const takenFileName = await File.findOne({
     owner: owner,
@@ -100,15 +80,15 @@ fileRouter.post("/folder", async (req, res) => {
   res.json("folder uploaded successfully.");
 });
 
-//get file list based on email
-fileRouter.get("/:email", async (req, res) => {
+//get file list based on id
+fileRouter.get("/:userId", async (req, res) => {
   const email = req.params.email;
   const files = await File.find({ owner: email }).sort({ title: 1 });
   res.send(files);
 });
 
-//get single file
-fileRouter.get("/:email/:id", async (req, res) => {
+//get single file to download
+fileRouter.get("/:id", async (req, res) => {
   const file = await File.findById(req.params.id);
   res.set({
     "Content-Type": file.mimeType,
@@ -118,13 +98,10 @@ fileRouter.get("/:email/:id", async (req, res) => {
 
 //rename file
 fileRouter.patch("/", async (req, res) => {
-  const { newName, id } = req.body
+  const { newName, id } = req.body;
 
-  await File.updateOne(
-    { _id: id },
-    { name: newName }
-  );
-  res.json("File renamed")
+  await File.updateOne({ _id: id }, { name: newName });
+  res.json("File renamed");
 });
 
 //delete file

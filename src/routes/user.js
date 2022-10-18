@@ -47,8 +47,9 @@ userRouter.get("/", async (req, res) => {
               bio: "",
               userID: userMeta.user_id,
               picture: userMeta.picture,
-              boxArray: [email],
-              accessArray: [email],
+              accountType: "free",
+              boxArray: [{email, color: "#00000008"}],
+              accessArray: [{email, color: "#00000008"}],
               shareArray: [],
             })
               .save()
@@ -98,7 +99,7 @@ userRouter.patch("/groups", async (req, res) => {
 
       await User.updateOne(
         { email: targetEmail },
-        { $addToSet: { accessArray: email } }
+        { $addToSet: { accessArray: { email, color: "#00000008" } } }
       );
 
       return res.json("add share email attempt made");
@@ -118,7 +119,7 @@ userRouter.patch("/groups", async (req, res) => {
 
       await User.updateOne(
         { email: targetEmail },
-        { $pull: { accessArray: email, boxArray: email } }
+        { $pull: { accessArray: { email }, boxArray: email } }
       );
       return res.json("delete share email/s attempt made");
     } else if (array == "box") {
