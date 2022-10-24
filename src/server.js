@@ -23,7 +23,7 @@ const checkJwt = auth({
 app.use(checkJwt)
 
 app.use('/files', require('./routes/file.js'));
-app.use('/user', require('./routes/user.js'));
+app.use('/users', require('./routes/user.js'));
 //app.use('/', require('./routes/group.js'));
 
 mongoose.set('useFindAndModify', false);

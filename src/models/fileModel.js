@@ -26,6 +26,10 @@ const fileSchema = mongoose.Schema(
     mimeType: {
       type: String,
       required: true
+    },
+    userId: {
+      type: String,
+      required: true
     }
   },
   {

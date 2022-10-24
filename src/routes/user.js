@@ -5,10 +5,15 @@ const User = require("../models/userModel");
 const fs = require("fs-extra");
 const axios = require("axios").default;
 
-userRouter.get("/", async (req, res) => {
-  const email = req.auth.payload["https://example.com/email"];
-  const user = await User.findOne({ email: email });
 
+userRouter.get("/:id", async (req, res) => {
+
+  const email = req.auth.payload["https://example.com/email"];
+  const userId = req.params.id;
+
+  const user = await User.findOne({ _id:  userId });
+
+  //else create user
   if (user) {
     return res.json(user);
   } else {
@@ -65,6 +70,88 @@ userRouter.get("/", async (req, res) => {
   }
 });
 
+userRouter.patch("/id", async (req, res) => {
+  const email = req.auth.payload["https://example.com/email"];
+  const id = req.params.id;
+  const { array, targetEmail, userId, desire } = req.body;
+
+  const user = await User.findOne({ _id: id });
+  const targetUser = await User.findOne({ _id: userId });
+
+  if (desire == "add") {
+    if (array == "share") {
+      if (!targetUser) {
+        return res.json({ emailExist: false });
+      }
+
+      user.shareArray.push(targetEmail)
+      targetUser.accessArray.push({ email, color: "#00000008" })
+
+      await user.save()
+      await targetUser.save()
+
+      /*
+      await User.updateOne(
+        { email: email },
+        { $addToSet: { shareArray: targetEmail } }
+      );
+
+      await User.updateOne(
+        { email: targetEmail },
+        { $addToSet: { accessArray: { email, color: "#00000008" } } }
+      );
+      */
+
+      return res.json("add share email attempt made");
+    } else if (array == "box") {
+
+      targetEmail.forEach(tEmail => user.boxArray.push(tEmail))
+      await user.save()
+
+      /*
+      await User.updateOne(
+        { email: email },
+        { $addToSet: { boxArray: { $each: targetEmail } } }
+      );
+      */
+
+      return res.json("add box email attempt made");
+    }
+  } else if (desire == "delete") {
+    if (array == "share") {
+
+      user.shareArray.filter(qEmail => targetEmail);
+      targetUser.accessArray.filter(qEmail => email);
+      targetUser.accessArray.filter(qEmail => email);
+
+      await User.updateOne(
+        { email: email },
+        { $pull: { shareArray: { $in: targetEmail } } }
+      );
+
+      await User.updateOne(
+        { email: targetEmail },
+        { $pull: { accessArray: { email }, boxArray: email } }
+      );
+      return res.json("delete share email/s attempt made");
+    } else if (array == "box") {
+
+      user.boxArray.filter(qEmail => targetEmail)
+      
+      /*
+      await User.updateOne(
+        { email: email },
+        { $pull: { boxArray: targetEmail } }
+      );
+      */
+
+      return res.json("delete box email/s attempt made");
+    }
+  }
+  return res.json("data not good");
+});
+
+
 userRouter.put("/", async (req, res) => {
 
   const id = req.auth.payload.sub
@@ -80,59 +167,8 @@ userRouter.put("/", async (req, res) => {
   res.json("update user info");
 });
 
-userRouter.patch("/groups", async (req, res) => {
-  const email = req.auth.payload["https://example.com/email"];
-  const { array, targetEmail, desire } = req.body;
 
-  const targetUser = await User.findOne({ email: targetEmail });
-
-  if (desire == "add") {
-    if (array == "share") {
-      if (!targetUser) {
-        return res.json({ emailExist: false });
-      }
-
-      await User.updateOne(
-        { email: email },
-        { $addToSet: { shareArray: targetEmail } }
-      );
-
-      await User.updateOne(
-        { email: targetEmail },
-        { $addToSet: { accessArray: { email, color: "#00000008" } } }
-      );
-
-      return res.json("add share email attempt made");
-    } else if (array == "box") {
-      await User.updateOne(
-        { email: email },
-        { $addToSet: { boxArray: { $each: targetEmail } } }
-      );
-      return res.json("add box email attempt made");
-    }
-  } else if (desire == "delete") {
-    if (array == "share") {
-      await User.updateOne(
-        { email: email },
-        { $pull: { shareArray: { $in: targetEmail } } }
-      );
-
-      await User.updateOne(
-        { email: targetEmail },
-        { $pull: { accessArray: { email }, boxArray: email } }
-      );
-      return res.json("delete share email/s attempt made");
-    } else if (array == "box") {
-      await User.updateOne(
-        { email: email },
-        { $pull: { boxArray: targetEmail } }
-      );
-      return res.json("delete box email/s attempt made");
-    }
-  }
-  return res.json("data not good");
-});
-
+/*
 userRouter.get("/email/:email", async (req, res) => {
 
   const user = await User.findOne({ email: req.params.email });
@@ -140,5 +176,6 @@ userRouter.get("/email/:email", async (req, res) => {
 
   res.json({ username, picture, bio });
 });
+*/
 
 module.exports = userRouter;
