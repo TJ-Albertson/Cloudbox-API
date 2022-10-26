@@ -10,8 +10,8 @@ const upload = multer({
       },
     }),
     limits: {
-      //        10,000,000 = 100MB
-      fileSize: 10000000,
+      //        15,728,640 = 15MB
+      fileSize: 15728640,
     },
     fileFilter(req, file, cb) {
       if (

@@ -13,10 +13,6 @@ const userSchema = mongoose.Schema(
     bio: {
       type: String,
     },
-    userID: {
-      type: String,
-      required: true,
-    },
     picture: {
       type: String,
       required: true,
@@ -26,7 +22,7 @@ const userSchema = mongoose.Schema(
       required: true, 
     },
     boxArray: [String],
-    accessArray: [{ email: String, color: String }],
+    accessArray: [String],
     shareArray: [String],
   },
   {

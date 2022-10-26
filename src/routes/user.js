@@ -6,12 +6,14 @@ const fs = require("fs-extra");
 const axios = require("axios").default;
 
 
-userRouter.get("/:id", async (req, res) => {
+userRouter.get("/:email", async (req, res) => {
 
-  const email = req.auth.payload["https://example.com/email"];
-  const userId = req.params.id;
+  //const email = req.auth.payload["https://example.com/email"];
+  const email = req.params.email;
 
-  const user = await User.findOne({ _id:  userId });
+  console.log("THSIFSDF", {email})
+
+  const user = await User.findOne({ email });
 
   //else create user
   if (user) {
@@ -47,14 +49,13 @@ userRouter.get("/:id", async (req, res) => {
             const userMeta = response.data;
 
             new User({
-              email: email,
+              email,
               username: userMeta.name,
               bio: "",
-              userID: userMeta.user_id,
               picture: userMeta.picture,
               accountType: "free",
-              boxArray: [{email, color: "#00000008"}],
-              accessArray: [{email, color: "#00000008"}],
+              boxArray: [email],
+              accessArray: [email],
               shareArray: [],
             })
               .save()
@@ -70,13 +71,13 @@ userRouter.get("/:id", async (req, res) => {
   }
 });
 
-userRouter.patch("/id", async (req, res) => {
-  const email = req.auth.payload["https://example.com/email"];
-  const id = req.params.id;
-  const { array, targetEmail, userId, desire } = req.body;
+userRouter.patch("/:email", async (req, res) => {
+  //const email = req.auth.payload["https://example.com/email"];
+  const email = req.params.email;
+  const { array, targetEmail, desire } = req.body;
 
-  const user = await User.findOne({ _id: id });
-  const targetUser = await User.findOne({ _id: userId });
+  const user = await User.findOne({ email });
+  const targetUser = await User.findOne({ email: targetEmail });
 
   if (desire == "add") {
     if (array == "share") {
@@ -85,7 +86,7 @@ userRouter.patch("/id", async (req, res) => {
       }
 
       user.shareArray.push(targetEmail)
-      targetUser.accessArray.push({ email, color: "#00000008" })
+      targetUser.accessArray.push(email)
 
       await user.save()
       await targetUser.save()

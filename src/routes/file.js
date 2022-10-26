@@ -8,12 +8,22 @@ const fs = require("fs-extra");
 //get files with userId
 fileRouter.get("/", async (req, res) => {
 
-  const userId = req.query.user;
+  const email = req.query.email;
 
-  const files = await File.findAll({ userId });
+  const files = await File.find({ email });
 
   res.send(files);
 });
+
+//get single file to download
+fileRouter.get("/:id", async (req, res) => {
+  const file = await File.findById(req.params.id);
+  res.set({
+    "Content-Type": file.mimeType,
+  });
+  res.sendFile(path.join(__dirname, "..", file.path));
+});
+
 
 //also auto delete file if error uploading to mongo
 //need to add auto rename title if matching
@@ -42,10 +52,10 @@ fileRouter.post("/", upload.single("file"), async (req, res) => {
 
   fs.move(
     "./files/temp/" + name,
-    "./files/users/" + userId + "/" + name + "_" + buf.toString("hex")
+    "./files/users/" + email + "/" + name + "_" + buf.toString("hex")
   );
   const path =
-    "./files/users/" + userId + "/" + name + "_" + buf.toString("hex");
+    "./files/users/" + email + "/" + name + "_" + buf.toString("hex");
 
   const file = new File({
     owner,
@@ -54,20 +64,11 @@ fileRouter.post("/", upload.single("file"), async (req, res) => {
     directory,
     path: path,
     mimeType: mimetype,
-    userId
   });
   await file.save();
   res.json("file uploaded successfully.");
 });
 
-//get single file to download
-fileRouter.get("/:id", async (req, res) => {
-  const file = await File.findById(req.params.id);
-  res.set({
-    "Content-Type": file.mimeType,
-  });
-  res.sendFile(path.join(__dirname, "..", file.path));
-});
 
 //rename file
 fileRouter.patch("/:id", async (req, res) => {
