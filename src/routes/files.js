@@ -5,30 +5,36 @@ const upload = require("../middleware/multer");
 const File = require("../models/fileModel");
 const fs = require("fs-extra");
 
-//get files with userId
 fileRouter.get("/", async (req, res) => {
-
-  const email = req.query.email;
-
-  const files = await File.find({ email });
+  const files = await File.find();
 
   res.send(files);
 });
 
-//get single file to download
 fileRouter.get("/:id", async (req, res) => {
-  const file = await File.findById(req.params.id);
-  res.set({
+
+  if(req.query.email) {
+    const files = await File.find({ email });
+
+    res.send(files);
+  }
+
+  try {
+    const file = await File.findById(req.params.id);
+  } catch (error) {
+    res.json("Most likely invalid File ID")
+  }
+  
+    res.set({
     "Content-Type": file.mimeType,
   });
   res.sendFile(path.join(__dirname, "..", file.path));
 });
 
-
 //also auto delete file if error uploading to mongo
 //need to add auto rename title if matching
 fileRouter.post("/", upload.single("file"), async (req, res) => {
-  const { owner, size, name, directory, userId } = req.body;
+  const { owner, size, name, directory } = req.body;
   const { mimetype } = req.file;
 
   let copyName = name;
@@ -52,10 +58,10 @@ fileRouter.post("/", upload.single("file"), async (req, res) => {
 
   fs.move(
     "./files/temp/" + name,
-    "./files/users/" + email + "/" + name + "_" + buf.toString("hex")
+    "./files/users/" + owner + "/" + name + "_" + buf.toString("hex")
   );
   const path =
-    "./files/users/" + email + "/" + name + "_" + buf.toString("hex");
+    "./files/users/" + owner + "/" + name + "_" + buf.toString("hex");
 
   const file = new File({
     owner,
@@ -68,7 +74,6 @@ fileRouter.post("/", upload.single("file"), async (req, res) => {
   await file.save();
   res.json("file uploaded successfully.");
 });
-
 
 //rename file
 fileRouter.patch("/:id", async (req, res) => {

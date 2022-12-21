@@ -15,15 +15,16 @@ app.use(bodyParser.json(), urlEncodedParser)
 app.use(cors());
 //app.use(express.json());
 
+
 const checkJwt = auth({
   audience: process.env.AUDIENCE,
   issuerBaseURL: process.env.ISSUERBASEURL,
 });
 
-app.use(checkJwt)
+//app.use(checkJwt)
 
-app.use('/files', require('./routes/file.js'));
-app.use('/users', require('./routes/user.js'));
+app.use('/files', require('./routes/files.js'));
+app.use('/users', require('./routes/users.js'));
 //app.use('/', require('./routes/group.js'));
 
 mongoose.set('useFindAndModify', false);
